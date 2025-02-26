@@ -12,7 +12,7 @@
     <link rel="stylesheet" href="ipl.css">
 </head>
 <body >
-	<img src="sanju.jpg" id="socialImg">
+    <img src="sanju.jpg" id="socialImg" onload="setTimeout(() => this.style.display = 'none', 1000);">
     <div id="schedule">Loading...</div>
     <div id="match-container"></div>
     <input type="date" id="datePicker" class="styled-date">
