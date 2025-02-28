@@ -134,8 +134,12 @@ body::before {
 }
 
 #small-area {
-    background-color: white;
-    width:250px;
-    align:center;
+    background-color: transparent; /* Makes the background transparent */
+    width: 300px; /* Sets the width to 300px */
+    margin: 0 auto; /* Centers the div */
+    border: 2px solid green; /* Adds a border */
+    border-radius: 10px; /* Rounds the corners */
+    padding: 10px; /* Adds some spacing inside the div */
+    text-align: center; /* Aligns the text to center */
 }
 
