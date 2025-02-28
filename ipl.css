@@ -5,9 +5,9 @@ body {
     color: #333;
     margin: 0;
     padding: 0;
-    background: url('sanjub.png') no-repeat center center fixed;
-    background-size: cover;
-    position: relative;
+    background: url('sanju.jpg') no-repeat center center fixed;
+    background-size: auto;
+    position: center;
 }
 body::before {
     content: "";
