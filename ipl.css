@@ -5,7 +5,7 @@ body {
     color: #333;
     margin: 0;
     padding: 0;
-    background: url('https://assets.iplt20.com/ipl/IPLHeadshot2022/258.png') no-repeat center center fixed;
+    background: url('sanju1.png') no-repeat center center fixed;
     background-size: cover;
     position: relative;
 }
@@ -131,5 +131,11 @@ body::before {
 .styled-button:active {
     background-color: #004d1a;
     transform: scale(0.98);
+}
+
+#small-area {
+    background-color: white;
+    width:250px;
+    align:center;
 }
 
