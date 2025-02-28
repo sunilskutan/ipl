@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IPL 2025 Stadium Details</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+        
+        header {
+            background-color: #004BA0;
+            color: white;
+            padding: 1rem;
+            text-align: center;
+        }
+        
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .stadium-details {
+            display: flex;
+            flex-direction: column;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            margin-top: 20px;
+        }
+        
+        .stadium-image {
+            width: 100%;
+            height: 300px;
+            background-size: cover;
+            background-position: center;
+        }
+        
+        .stadium-info {
+            padding: 20px;
+        }
+        
+        .stadium-name {
+            color: #004BA0;
+            margin-top: 0;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .info-item {
+            background-color: #f9f9f9;
+            padding: 15px;
+            border-radius: 5px;
+            border-left: 4px solid #004BA0;
+        }
+        
+        .info-title {
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #004BA0;
+        }
+        
+        .back-link {
+            display: inline-block;
+            margin-top: 20px;
+            color: #004BA0;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        
+        .back-link:hover {
+            text-decoration: underline;
+        }
+        
+        @media (min-width: 768px) {
+            .stadium-details {
+                flex-direction: row;
+            }
+            
+            .stadium-image {
+                width: 50%;
+                height: auto;
+            }
+            
+            .stadium-info {
+                width: 50%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>IPL 2025 Stadiums</h1>
+    </header>
+    
+    <div class="container">
+        <a href="index.html" class="back-link">← Home Page</a>
+        
+        <div class="stadium-details" id="stadium-details">
+            <div class="stadium-image" id="stadium-image"></div>
+            <div class="stadium-info">
+                <h2 class="stadium-name" id="stadium-name">Stadium Name</h2>
+                <p id="stadium-description">Loading stadium details...</p>
+                
+                <div class="info-grid">
+                    <div class="info-item">
+                        <div class="info-title">Location</div>
+                        <div id="stadium-location">Loading...</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-title">Capacity</div>
+                        <div id="stadium-capacity">Loading...</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-title">Home Team</div>
+                        <div id="stadium-team">Loading...</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-title">Established</div>
+                        <div id="stadium-established">Loading...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+
+var stad = sessionStorage.getItem("stadiumName");
+
+//alert(stad);
+        // Stadium data (this would typically be fetched from a server)
+        const stadiumsData = {
+            "Wankhede Stadium, Mumbai": {
+                name: "Wankhede Stadium",
+                description: "Wankhede Stadium is one of India's iconic cricket venues, known for its electric atmosphere during IPL matches. The stadium has witnessed numerous historic cricketing moments, including the 2011 World Cup final.",
+                location: "Mumbai, Maharashtra",
+                capacity: "33,108",
+                team: "Mumbai Indians",
+                established: "1974",
+               // imageUrl: "/api/placeholder/800/400"
+		 imageUrl: "https://assets.architecturaldigest.in/photos/60082844a28465f75014be44/16%3A9/w_1280%2Cc_limit/ipl-2018-wankhede-stadium-mumbai-indians-chennai-superkings-1366x768.jpg"
+            },
+
+
+  "Eden Gardens, Kolkata": {
+    name: "Eden Gardens",
+    description: "Eden Gardens is one of the most iconic cricket stadiums in India, known for its passionate crowd and historic matches. Established in 1864, it has hosted numerous significant cricket events, including World Cup finals.",
+    location: "Kolkata, West Bengal",
+    capacity: "68,000",
+    team: "Kolkata Knight Riders",
+    established: "1864",
+    imageUrl: "https://getcricketinfo.com/wp-content/uploads/2023/06/EDEN_GARDENS_OF_KOLKATA.jpg"
+  },
+  "MA Chidambaram Stadium, Chennai": {
+    name: "M. A. Chidambaram Stadium",
+    description: "Also known as Chepauk Stadium, it is renowned for its enthusiastic fans and has been a fortress for the Chennai Super Kings in the IPL. The stadium offers a vibrant atmosphere during matches.",
+    location: "Chennai, Tamil Nadu",
+    capacity: "38,200",
+    team: "Chennai Super Kings",
+    established: "1916",
+    imageUrl: "https://sportsdigest.in/wp-content/uploads/2023/03/MA-Chidambaram-Stadium-PhotoTwitter.jpg"
+  },
+  "Narendra Modi Stadium, Ahmedabad": {
+    name: "Narendra Modi Stadium",
+    description: "Located in Ahmedabad, Gujarat, the Narendra Modi Stadium is the largest cricket stadium in the world, with a seating capacity of 132,000 spectators. It serves as the home ground for the Gujarat Titans in the Indian Premier League (IPL).",
+    location: "Ahmedabad, Gujarat",
+    capacity: "132,000",
+    team: "Gujarat Titans",
+    established: "1983 (renovated in 2020)",
+    imageUrl: "https://images.travelandleisureasia.com/wp-content/uploads/sites/2/2020/02/Motera-Stadium-feature.jpg"
+  },
+  "M Chinnaswamy Stadium, Bengaluru": {
+    name: "M. Chinnaswamy Stadium",
+    description: "Situated in the heart of Bengaluru, this stadium is known for its electric atmosphere during matches. It has been the home ground for the Royal Challengers Bangalore since the inception of the IPL.",
+    location: "Bengaluru, Karnataka",
+    capacity: "40,000",
+    team: "Royal Challengers Bangalore",
+    established: "1969",
+    imageUrl: "https://i.ytimg.com/vi/GEVQ29ReLNE/maxresdefault.jpg"
+  },
+  "Arun Jaitley Stadium, Delhi": {
+    name: "Arun Jaitley Stadium",
+    description: "Formerly known as Feroz Shah Kotla Stadium, it is one of the oldest cricket venues in India. The stadium has witnessed numerous historic cricketing moments and is the home ground for the Delhi Capitals.",
+    location: "Delhi",
+    capacity: "41,820",
+    team: "Delhi Capitals",
+    established: "1883",
+    imageUrl: "https://tse4.mm.bing.net/th?id=OIF.%2FX0yigQKzgZYQcvjPoxrqw&pid=Api"
+  },
+  "Rajiv Gandhi International Stadium, Hyderabad": {
+    name: "Rajiv Gandhi International Cricket Stadium",
+    description: "Located in Hyderabad, this stadium is known for its modern facilities and has been the home ground for the Sunrisers Hyderabad. It offers a great atmosphere for both players and spectators.",
+    location: "Hyderabad, Telangana",
+    capacity: "55,000",
+    team: "Sunrisers Hyderabad",
+    established: "2004",
+    imageUrl: "https://2.bp.blogspot.com/-_cxGd10QY-w/UBEqhKjX8hI/AAAAAAAAAf8/XpmHxjHAjmc/s1600/Rajiv%2Bgandhi%2BStadium%2Buppal.jpg"
+  },
+
+
+  "Sawai Mansingh Stadium, Jaipur": {
+    name: "Sawai Mansingh Stadium",
+    description: "Located in Jaipur, this stadium is known for its excellent pitch conditions and vibrant crowd support. It serves as the home ground for the Rajasthan Royals in the IPL.",
+    location: "Jaipur, Rajasthan",
+    capacity: "30,000",
+    team: "Rajasthan Royals",
+    established: "1969",
+    imageUrl: "https://cdn-wp.thesportsrush.com/2023/04/ad0268ac-untitled-design-67.jpg?format=auto&q=75&w=3840"
+  },
+  "Bharat Ratna Shri Atal Bihari Vajpayee Ekana Cricket Stadium, Lucknow": {
+    name: "BRSABV Ekana Cricket Stadium",
+    description: "Also known as Ekana Stadium, it is one of the newest international cricket venues in India. It is the home ground for the Lucknow Super Giants in the IPL.",
+    location: "Lucknow, Uttar Pradesh",
+    capacity: "50,000",
+    team: "Lucknow Super Giants",
+    established: "2017",
+    imageUrl: "https://getcricketinfo.com/wp-content/uploads/2022/01/Lucknow-Cricket-Stadium-1024x768.jpg"
+  },
+  "Himachal Pradesh Cricket Association Stadium, Dharamsala": {
+    name: "HPCA Cricket Stadium",
+    description: "Nestled in the Himalayas, the HPCA Stadium in Dharamsala offers breathtaking views and a unique cricketing experience. It serves as a secondary home ground for the Punjab Kings in the IPL.",
+    location: "Dharamsala, Himachal Pradesh",
+    capacity: "23,000",
+    team: "Punjab Kings",
+    established: "2003",
+    imageUrl: "https://i.pinimg.com/736x/bd/59/dc/bd59dca0a0267f8b0edc9b9938e9beed.jpg"
+  },
+  "Barsapara Cricket Stadium, Guwahati": {
+    name: "ACA Cricket Stadium",
+    description: "Also known as Barsapara Stadium, this venue in Guwahati is one of the newest international cricket stadiums in India and has hosted IPL matches as an additional venue for the Rajasthan Royals.",
+    location: "Guwahati, Assam",
+    capacity: "40,000",
+    team: "Rajasthan Royals (additional venue)",
+    established: "2012",
+    imageUrl: "https://tse4.mm.bing.net/th?id=OIP.TX1DQETHCmkRhs4fhrksZAHaE7&pid=Api"
+  },
+  "Dr YS Rajasekhara Reddy ACA-VDCA Cricket Stadium, Visakhapatnam": {
+    name: "ACA-VDCA Cricket Stadium",
+    description: "Situated in Visakhapatnam, this stadium is known for its excellent pitch and spectator-friendly facilities. It has been used as an additional venue for the Delhi Capitals in the IPL.",
+    location: "Visakhapatnam, Andhra Pradesh",
+    capacity: "27,500",
+    team: "Delhi Capitals (additional venue)",
+    established: "2003",
+    imageUrl: "https://i.redd.it/jsqarhispen61.jpg"
+  },
+  "New PCA Stadium, New Chandigarh": {
+    name: "Maharaja Yadavindra Singh Stadium",
+    description: "Located in Mullanpur, near Chandigarh, this newly developed stadium is set to host high-profile matches in the future and could become the home ground for the Punjab Kings.",
+    location: "Mullanpur, Punjab",
+    capacity: "38,000",
+    team: "Punjab Kings (future home ground)",
+    established: "Upcoming",
+    imageUrl: "https://i.ytimg.com/vi/XM8MwKJFZiA/maxresdefault.jpg"
+  }
+
+
+
+
+
+        };
+        
+        // Function to load stadium details
+        function loadStadiumDetails() {
+            // Get the stadium ID from the URL parameter
+//            const urlParams = new URLSearchParams(window.location.search);
+//            const stadiumId = urlParams.get('id');
+
+//testing
+            
+const stadiumId = stad;
+
+            // If stadium ID exists in our data, populate the page
+            if (stadiumId && stadiumsData[stadiumId]) {
+                const stadium = stadiumsData[stadiumId];
+                
+                document.getElementById('stadium-name').textContent = stadium.name;
+                document.getElementById('stadium-description').textContent = stadium.description;
+                document.getElementById('stadium-location').textContent = stadium.location;
+                document.getElementById('stadium-capacity').textContent = stadium.capacity;
+                document.getElementById('stadium-team').textContent = stadium.team;
+                document.getElementById('stadium-established').textContent = stadium.established;
+                document.getElementById('stadium-image').style.backgroundImage = `url('${stadium.imageUrl}')`;
+                
+                document.title = `${stadium.name} - IPL 2025`;
+            } else {
+                // If stadium not found, show error message
+                document.getElementById('stadium-details').innerHTML = `
+                    <div class="stadium-info" style="width:100%">
+                        <h2>Stadium Not Found</h2>
+                        <p>Sorry, the requested stadium information could not be found.</p>
+                        <a href="index.html" class="back-link">Home Page</a>
+                    </div>
+                `;
+            }
+        }
+        
+        // Load stadium details when page loads
+        window.addEventListener('DOMContentLoaded', loadStadiumDetails);
+    </script>
+</body>
+</html>
