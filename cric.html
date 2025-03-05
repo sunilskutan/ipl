@@ -1,0 +1,105 @@
+   
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Sequential GIF Webpage</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+        }
+        .top-left-gif, .top-right-gif {
+            position: absolute;
+            top: 10px;
+            max-width: 200px;
+            max-height: 200px;
+            display: none;
+        }
+        .top-left-gif {
+            left: 10px;
+        }
+        .top-right-gif {
+            right: 10px;
+        }
+        .button-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        .flashy-button {
+            padding: 15px 30px;
+            font-size: 18px;
+            cursor: pointer;
+            animation: flash 1s infinite;
+            border: none;
+            background-color: #4CAF50;
+            color: white;
+            transition: all 0.3s ease;
+            border-radius: 5px;
+        }
+        .flashy-button:hover {
+            transform: scale(1.1);
+        }
+        .home-button {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 10px 20px;
+            background-color: #2196F3;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+        @keyframes flash {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+    </style>
+</head>
+<body>
+    <img id="leftGif" src="https://media.tenor.com/oVTkatpHB9IAAAAM/%E0%A4%A4%E0%A4%BE%E0%A4%95%E0%A4%BC%E0%A4%A4-sanju-samson.gif/200/200" alt="Top Left GIF" class="top-left-gif">
+    <img id="rightGif" src="https://media1.giphy.com/media/lhV1UjyiKtKqPQMYYH/giphy.webp?cid=790b7611ii1jhubz7ey5jal5xw7e706aacnn8y884wol1jw6&ep=v1_gifs_search&rid=giphy.webp&ct=g/200/200" alt="Top Right GIF" class="top-right-gif">
+    
+    <div class="button-container">
+       <a href="https://cdn.shopify.com/s/files/1/2406/2359/files/CRICKET_FIELD_2_480x480.png?v=1619232474"> <button class="flashy-button">Ground</button> </a>
+       <a href="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRN4xMWMFi_pXS5-8odceYIioPjV9Rz2_bzug&s "><button class="flashy-button">Pitch</button></a>
+       <a href="https://w7.pngwing.com/pngs/645/987/png-transparent-bowling-cricket-line-and-length-fast-bowling-cricket-pitch-cricket-angle-text-triangle.png"> <button class="flashy-button">Bowling</button></a>
+        <button class="flashy-button">Others</button>
+    </div>
+    
+    <a href="index.html" class="home-button">Home</a>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const leftGif = document.getElementById('leftGif');
+            const rightGif = document.getElementById('rightGif');
+
+            // First, show left GIF
+            function showLeftGif() {
+                leftGif.style.display = 'block';
+                rightGif.style.display = 'none';
+            }
+
+            // Then, show right GIF after 5 seconds
+            function showRightGif() {
+                leftGif.style.display = 'none';
+                rightGif.style.display = 'block';
+            }
+
+            // Start the sequence
+            showLeftGif();
+            
+            // Set timeout to switch to right GIF after 5 seconds
+            setTimeout(showRightGif, 5000);
+        });
+    </script>
+</body>
+</html>
