@@ -142,7 +142,7 @@ const iplTeams = [
         titles: 0,
         titleYears: [],
         color: "#0078BC",
-        captain: "Axar Patel 16.50 Cr)",
+        captain: "Axar Patel (16.50 Cr)",
         coach: "Ricky Ponting",
         logo: "https://tse1.mm.bing.net/th?id=OIP.EF5uSd-ZCZjWzvYqPXQB5AHaHa&pid=Api",
         description: "Formerly known as Delhi Daredevils, the team was rebranded as Delhi Capitals in 2019. Despite never winning the IPL title, they have been finalists and are considered one of the strongest teams with young talent.",
