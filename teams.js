@@ -57,7 +57,7 @@ const iplTeams = [
         homeGround: "M. A. Chidambaram Stadium, Chennai",
         owner: "Chennai Super Kings Cricket Ltd.",
         titles: 4,
-        titleYears: 2010, 2011, 2018, 2021, 2023],
+        titleYears: [2010, 2011, 2018, 2021, 2023],
         color: "#FFFF00",
         captain: "Ruturaj Gaikwad (18 Cr)",
         coach: "Stephen Fleming",
