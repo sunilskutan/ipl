@@ -1,37 +1,48 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta property="og:title" content="IPL Teams Explorer">
-    <meta property="og:description" content="Explore IPL teams, their history, and more!">
-    <meta property="og:image" content="sanju1.png">
-    <meta property="og:url" content="sanju1.png">
-    <meta property="og:type" content="website">
-    <title>IPL Daily Schedule</title>
-    <link rel="stylesheet" href="ipl.css">
+  <title>QR Code Scanner</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://unpkg.com/html5-qrcode@2.3.8/minified/html5-qrcode.min.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js"></script>
 </head>
 <body>
-<img src="sanju.jpg" id="socialImg" onload="setTimeout(() => this.style.display = 'none', 1000);">
+  <h2>Scan QR Code</h2>
+  <div id="reader" style="width: 300px; margin:auto;"></div>
+  <div id="result" style="text-align: center; font-size: 1.2em; margin-top: 10px;"></div>
 
-    <div id="schedule">Loading...</div>
-    <div id="match-container"></div>
-    <input type="date" id="datePicker" class="styled-date">
-    <button class="styled-button" onclick="checkSchedule()">Check Schedule</button>
-    <br><br>
-	<div id="small-area">
-	<a href="javascript:location.reload();">🔄</a>
-	&nbsp;&nbsp;&nbsp;&nbsp;
-     	<a href="teams.html">🦁</a>
-    	&nbsp;&nbsp;&nbsp;&nbsp;
-	<a href="#"  onclick="getStadium()" title="Stadium Details">🏟</a>  
+  <script>
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "your-app.firebaseapp.com",
+      databaseURL: "https://your-app-default-rtdb.firebaseio.com",
+      projectId: "your-app",
+      storageBucket: "your-app.appspot.com",
+      messagingSenderId: "123456789",
+      appId: "1:123456789:web:abc123"
+    };
 
-    	&nbsp;&nbsp;&nbsp;&nbsp;
-    	<a href="cric.html">🤵</a>
-    	&nbsp;&nbsp;&nbsp;&nbsp;
-    	<span id="audioIcon">🔊</span>
-	</div>
-    <script src="ipl.js">
-    </script>
+    const app = firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    const qrCodeSuccessCallback = (decodedText, decodedResult) => {
+      document.getElementById("result").textContent = "Scanned: " + decodedText;
+
+      // Update Firebase
+      firebase.database().ref("scans").set({
+        scanData: decodedText
+      });
+
+      html5QrcodeScanner.clear(); // stop scanning
+    };
+
+    const html5QrcodeScanner = new Html5QrcodeScanner(
+      "reader", 
+      { fps: 10, qrbox: { width: 250, height: 250 } },
+      /* verbose= */ false
+    );
+    html5QrcodeScanner.render(qrCodeSuccessCallback);
+  </script>
 </body>
 </html>
