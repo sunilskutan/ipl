@@ -182,7 +182,9 @@
           // Better camera selection for mobile
           experimentalFeatures: {
             useBarCodeDetectorIfSupported: true
-          }
+          },
+          // Request back camera on mobile
+          facingMode: "environment"
         },
         false
       );
@@ -191,7 +193,63 @@
     }
     
     // Start the scanner when page loads
-    startScanner();
+    document.addEventListener('DOMContentLoaded', function() {
+      checkCameraSupport();
+    });
+    
+    function checkCameraSupport() {
+      // Check if camera is supported
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        showError("Camera not supported on this device/browser");
+        return;
+      }
+      
+      // Check for HTTPS (required for camera access)
+      if (location.protocol !== 'https:' && location.hostname !== 'localhost') {
+        showError("Camera requires HTTPS connection. Please use https:// or localhost");
+        return;
+      }
+      
+      // Request camera permission first
+      navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
+        .then(function(stream) {
+          // Stop the test stream
+          stream.getTracks().forEach(track => track.stop());
+          // Start the actual scanner
+          setTimeout(startScanner, 500);
+        })
+        .catch(function(error) {
+          console.error("Camera access error:", error);
+          let errorMsg = "Camera access denied. ";
+          
+          if (error.name === 'NotAllowedError') {
+            errorMsg += "Please allow camera access and refresh the page.";
+          } else if (error.name === 'NotFoundError') {
+            errorMsg += "No camera found on this device.";
+          } else if (error.name === 'NotSupportedError') {
+            errorMsg += "Camera not supported on this browser.";
+          } else {
+            errorMsg += "Please check camera permissions and try again.";
+          }
+          
+          showError(errorMsg);
+        });
+    }
+    
+    function showError(message) {
+      document.querySelector('.status').innerHTML = `
+        <div style="color: #f44336; background: #ffebee; padding: 15px; border-radius: 8px; margin: 10px 0;">
+          <strong>⚠️ ${message}</strong><br>
+          <small style="display: block; margin-top: 10px;">
+            Troubleshooting tips:<br>
+            • Make sure you're using HTTPS<br>
+            • Allow camera permissions<br>
+            • Try a different browser<br>
+            • Check if camera is used by another app
+          </small>
+        </div>
+      `;
+    }
     
     // Handle page visibility changes (mobile browsers often pause camera when tab not active)
     document.addEventListener('visibilitychange', function() {
