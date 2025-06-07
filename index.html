@@ -2,7 +2,7 @@
 <html>
 <head>
   <title>QR Code & Barcode Scanner</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <script src="https://unpkg.com/html5-qrcode@2.3.8/minified/html5-qrcode.min.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js"></script>
@@ -12,6 +12,7 @@
       margin: 0;
       padding: 20px;
       background-color: #f5f5f5;
+      overscroll-behavior: none;
     }
     .container {
       max-width: 400px;
@@ -139,6 +140,7 @@
       color: #2e7d32;
       border: 1px solid #c8e6c8;
     }
+    .supported-formats {
       margin-top: 20px;
       padding: 15px;
       background-color: #f0f8ff;
@@ -184,6 +186,7 @@
       <div class="status">Position camera over QR code or barcode</div>
       <div class="scanner-controls">
         <button id="stop-camera-btn" class="control-btn stop-btn">⏹️ Stop Camera</button>
+        <button id="switch-camera-btn" class="control-btn">🔄 Switch Camera</button>
         <button id="restart-camera-btn" class="control-btn restart-btn">🔄 Restart</button>
       </div>
     </div>
@@ -224,7 +227,6 @@
     const db = firebase.database();
     
     const qrCodeSuccessCallback = (decodedText, decodedResult) => {
-      // Show the result
       const resultDiv = document.getElementById("result");
       resultDiv.innerHTML = `
         <strong>Scanned Successfully! 🎉</strong><br>
@@ -233,7 +235,6 @@
       `;
       resultDiv.style.display = "block";
       
-      // Save to Firebase with timestamp and format info
       const timestamp = new Date().toISOString();
       firebase.database().ref("scans").push({
         scanData: decodedText,
@@ -242,12 +243,10 @@
         scanType: decodedResult.result.format.formatName.includes('QR') ? 'QR Code' : 'Barcode'
       });
       
-      // Stop scanning temporarily
       if (html5QrcodeScanner && isScanning) {
         html5QrcodeScanner.pause(true);
       }
       
-      // Resume scanning after 3 seconds
       setTimeout(() => {
         resultDiv.style.display = "none";
         if (html5QrcodeScanner && isScanning) {
@@ -257,24 +256,27 @@
     };
     
     const qrCodeErrorCallback = (errorMessage) => {
-      // Only log errors, don't show them to user as they're frequent during scanning
       console.log("Scan error:", errorMessage);
     };
     
     let html5QrcodeScanner;
     let isScanning = false;
+    let cameras = [];
+    let currentCameraIndex = 0;
     
     // UI Elements
     const startSection = document.getElementById('start-section');
     const scannerSection = document.getElementById('scanner-section');
     const startBtn = document.getElementById('start-camera-btn');
     const stopBtn = document.getElementById('stop-camera-btn');
+    const switchCameraBtn = document.getElementById('switch-camera-btn');
     const restartBtn = document.getElementById('restart-camera-btn');
     const cameraStatus = document.getElementById('camera-status');
     
     // Event Listeners
     startBtn.addEventListener('click', initializeCamera);
     stopBtn.addEventListener('click', stopCamera);
+    switchCameraBtn.addEventListener('click', switchCamera);
     restartBtn.addEventListener('click', restartCamera);
     
     function showStatus(message, type = 'loading') {
@@ -287,44 +289,61 @@
       cameraStatus.style.display = 'none';
     }
     
-    function initializeCamera() {
+    async function getAvailableCameras() {
+      try {
+        cameras = await Html5Qrcode.getCameras();
+        if (cameras && cameras.length) {
+          return true;
+        } else {
+          showStatus('❌ No cameras found on this device.', 'error');
+          return false;
+        }
+      } catch (error) {
+        console.error("Error getting cameras:", error);
+        showStatus('❌ Error accessing cameras: ' + error.message, 'error');
+        return false;
+      }
+    }
+    
+    async function initializeCamera() {
       startBtn.disabled = true;
       startBtn.textContent = '🔄 Starting Camera...';
       showStatus('🔍 Checking camera permissions...', 'loading');
       
-      // Check basic requirements
       if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
         showStatus('❌ Camera not supported on this device/browser', 'error');
         resetStartButton();
         return;
       }
       
-      // Check HTTPS (except for localhost)
       if (location.protocol !== 'https:' && !location.hostname.includes('localhost') && location.hostname !== '127.0.0.1') {
-        showStatus('🔒 HTTPS required for camera access. Your GitHub Pages should use HTTPS automatically.', 'error');
+        showStatus('🔒 HTTPS required for camera access.', 'error');
         resetStartButton();
         return;
       }
       
-      // Request camera permission
-      navigator.mediaDevices.getUserMedia({ 
-        video: { 
-          facingMode: "environment",
-          width: { ideal: 1280 },
-          height: { ideal: 720 }
-        } 
-      })
-      .then(function(stream) {
+      const hasCameras = await getAvailableCameras();
+      if (!hasCameras) {
+        resetStartButton();
+        return;
+      }
+      
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ 
+          video: { 
+            deviceId: cameras[currentCameraIndex]?.id ? { exact: cameras[currentCameraIndex].id } : undefined,
+            facingMode: cameras[currentCameraIndex]?.id ? undefined : "environment",
+            width: { ideal: 1280 },
+            height: { ideal: 720 }
+          } 
+        });
         showStatus('✅ Camera access granted! Starting scanner...', 'success');
-        // Stop the test stream
         stream.getTracks().forEach(track => track.stop());
-        // Start the actual scanner after a brief delay
-        setTimeout(startScanner, 1000);
-      })
-      .catch(function(error) {
+        setTimeout(() => startScanner(cameras[currentCameraIndex]?.id), 1000);
+      } catch (error) {
         console.error("Camera access error:", error);
         handleCameraError(error);
-      });
+      }
     }
     
     function handleCameraError(error) {
@@ -350,10 +369,10 @@
       errorMsg += `
         <br><br>
         <strong>💡 Troubleshooting:</strong><br>
-        • Make sure you clicked "Allow" for camera permission<br>
-        • Close other apps that might be using the camera<br>
-        • Try refreshing the page<br>
-        • Try a different browser (Chrome recommended)
+        • Ensure you clicked "Allow" for camera permission<br>
+        • Close other apps using the camera<br>
+        • Try switching cameras<br>
+        • Refresh the page or try a different browser
       `;
       
       showStatus(errorMsg, 'error');
@@ -365,13 +384,13 @@
       startBtn.textContent = '🎥 Start Camera';
     }
     
-    function startScanner() {
+    function startScanner(cameraId) {
       if (isScanning) return;
       
       html5QrcodeScanner = new Html5QrcodeScanner(
         "reader",
         { 
-          fps: 10, 
+          fps: 10,
           qrbox: { width: 250, height: 250 },
           supportedScanTypes: [Html5QrcodeScanType.SCAN_TYPE_CAMERA],
           formatsToSupport: [
@@ -388,9 +407,9 @@
             Html5QrcodeSupportedFormats.DATA_MATRIX,
             Html5QrcodeSupportedFormats.PDF_417
           ],
-          aspectRatio: 1.0,
+          aspectRatio: window.innerWidth <= 768 ? 1.0 : 4/3,
           disableFlip: false,
-          facingMode: "environment",
+          cameraId: cameraId,
           experimentalFeatures: {
             useBarCodeDetectorIfSupported: true
           }
@@ -400,11 +419,11 @@
       
       html5QrcodeScanner.render(qrCodeSuccessCallback, qrCodeErrorCallback);
       
-      // Show scanner UI
       startSection.style.display = 'none';
       scannerSection.style.display = 'block';
       isScanning = true;
       hideStatus();
+      switchCameraBtn.style.display = cameras.length > 1 ? 'block' : 'none';
     }
     
     function stopCamera() {
@@ -416,7 +435,6 @@
         });
       }
       
-      // Show start UI
       scannerSection.style.display = 'none';
       startSection.style.display = 'block';
       isScanning = false;
@@ -424,10 +442,22 @@
       hideStatus();
     }
     
+    function switchCamera() {
+      if (html5QrcodeScanner && isScanning && cameras.length > 1) {
+        html5QrcodeScanner.clear().then(() => {
+          currentCameraIndex = (currentCameraIndex + 1) % cameras.length;
+          setTimeout(() => startScanner(cameras[currentCameraIndex].id), 500);
+        }).catch(err => {
+          console.error('Error switching camera:', err);
+          stopCamera();
+        });
+      }
+    }
+    
     function restartCamera() {
       if (html5QrcodeScanner && isScanning) {
         html5QrcodeScanner.clear().then(() => {
-          setTimeout(startScanner, 500);
+          setTimeout(() => startScanner(cameras[currentCameraIndex]?.id), 500);
         }).catch(err => {
           console.error('Error restarting scanner:', err);
           stopCamera();
@@ -435,19 +465,14 @@
       }
     }
     
-    // Initialize when page loads
     document.addEventListener('DOMContentLoaded', function() {
       console.log('Page loaded, scanner ready');
-      // Don't auto-start, wait for user interaction
     });
     
-    // Handle page visibility changes (mobile browsers often pause camera when tab not active)
     document.addEventListener('visibilitychange', function() {
       if (document.hidden) {
-        // Page is hidden, scanner will pause automatically
         console.log('Scanner paused - page hidden');
       } else {
-        // Page is visible again
         console.log('Scanner resumed - page visible');
       }
     });
