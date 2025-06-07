@@ -4,8 +4,12 @@
 <head>
   <title>Mobile QR Scanner</title>
   <script src="https://unpkg.com/html5-qrcode"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+
+<!-- Load Firestore SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+<script src="https://unpkg.com/html5-qrcode"></script>
+
 </head>
 <body>
   <h3>Scan QR Code (Mobile)</h3>
@@ -21,36 +25,43 @@
   appId: "1:154631878754:web:7243c8fe784abc1626393b",
   measurementId: "G-8TJ9ZWEK6M"
 };
-    firebase.initializeApp(firebaseConfig);
+  
+ // Initialize Firebase & Firestore
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
 
+  // Read session from URL
   const session = new URLSearchParams(location.search).get("session") || "defaultSession";
 
+  // On QR Code success
   function onScanSuccess(decodedText, decodedResult) {
-    // STOP the scanner after success
     html5QrcodeScanner.clear().then(() => {
       console.log("Scanner stopped after scan.");
-    }).catch(err => {
-      console.error("Failed to stop scanner: ", err);
     });
 
-    // SEND data to Firebase
-    firebase.database().ref("sessions/" + session).set({
-      value: decodedText,
-      timestamp: Date.now()
-    }).then(() => {
-      alert("Scanned and sent: " + decodedText);
-    }).catch(error => {
-      alert("Error sending to Firebase: " + error);
-    });
 const beep = new Audio('https://actions.google.com/sounds/v1/alarms/beep_short.ogg');
 beep.play();
+
+
+    // Save to Firestore
+    db.collection("scans").doc(session).set({
+      value: decodedText,
+      timestamp: firebase.firestore.FieldValue.serverTimestamp()
+    }).then(() => {
+      alert("Data sent to Firestore: " + decodedText);
+    }).catch((error) => {
+      alert("Error writing to Firestore: " + error);
+    });
   }
 
+  // Start the QR Scanner
   const html5QrcodeScanner = new Html5QrcodeScanner("reader", {
     fps: 10,
     qrbox: 250
   });
   html5QrcodeScanner.render(onScanSuccess);
-  </script>
+</script>
+
+
 </body>
 </html>
