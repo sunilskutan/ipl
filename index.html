@@ -50,7 +50,95 @@
       color: #666;
       font-size: 0.9em;
     }
-    .supported-formats {
+    .start-section {
+      text-align: center;
+      padding: 40px 20px;
+    }
+    .start-message {
+      margin-bottom: 30px;
+    }
+    .start-message h3 {
+      color: #333;
+      margin-bottom: 15px;
+      font-size: 1.5em;
+    }
+    .start-message p {
+      color: #666;
+      font-size: 1.1em;
+      line-height: 1.5;
+    }
+    .start-btn {
+      background: linear-gradient(135deg, #4CAF50, #45a047);
+      color: white;
+      border: none;
+      padding: 18px 40px;
+      font-size: 1.2em;
+      border-radius: 50px;
+      cursor: pointer;
+      transition: all 0.3s;
+      box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+      font-weight: bold;
+    }
+    .start-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+    }
+    .start-btn:active {
+      transform: translateY(0);
+    }
+    .start-btn:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+    .scanner-controls {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      margin-top: 20px;
+    }
+    .control-btn {
+      background: #fff;
+      color: #333;
+      border: 2px solid #ddd;
+      padding: 12px 20px;
+      border-radius: 25px;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-size: 0.95em;
+      font-weight: 500;
+    }
+    .control-btn:hover {
+      border-color: #4CAF50;
+      color: #4CAF50;
+      transform: translateY(-1px);
+    }
+    .stop-btn:hover {
+      border-color: #f44336;
+      color: #f44336;
+    }
+    .camera-status {
+      margin-top: 20px;
+      padding: 15px;
+      border-radius: 8px;
+      font-size: 0.95em;
+    }
+    .status-loading {
+      background: #e3f2fd;
+      color: #1976d2;
+      border: 1px solid #bbdefb;
+    }
+    .status-error {
+      background: #ffebee;
+      color: #d32f2f;
+      border: 1px solid #ffcdd2;
+    }
+    .status-success {
+      background: #e8f5e8;
+      color: #2e7d32;
+      border: 1px solid #c8e6c8;
+    }
       margin-top: 20px;
       padding: 15px;
       background-color: #f0f8ff;
@@ -79,8 +167,27 @@
 <body>
   <div class="container">
     <h2>QR Code & Barcode Scanner</h2>
-    <div id="reader"></div>
-    <div class="status">Position camera over QR code or barcode</div>
+    
+    <div id="start-section" class="start-section">
+      <div class="start-message">
+        <h3>📷 Ready to Scan</h3>
+        <p>Click the button below to start your camera and begin scanning QR codes and barcodes.</p>
+      </div>
+      <button id="start-camera-btn" class="start-btn">
+        🎥 Start Camera
+      </button>
+      <div id="camera-status" class="camera-status"></div>
+    </div>
+    
+    <div id="scanner-section" style="display: none;">
+      <div id="reader"></div>
+      <div class="status">Position camera over QR code or barcode</div>
+      <div class="scanner-controls">
+        <button id="stop-camera-btn" class="control-btn stop-btn">⏹️ Stop Camera</button>
+        <button id="restart-camera-btn" class="control-btn restart-btn">🔄 Restart</button>
+      </div>
+    </div>
+    
     <div id="result"></div>
     
     <div class="supported-formats">
@@ -120,7 +227,7 @@
       // Show the result
       const resultDiv = document.getElementById("result");
       resultDiv.innerHTML = `
-        <strong>Scanned Successfully!</strong><br>
+        <strong>Scanned Successfully! 🎉</strong><br>
         <strong>Format:</strong> ${decodedResult.result.format.formatName}<br>
         <strong>Data:</strong> ${decodedText}
       `;
@@ -135,13 +242,17 @@
         scanType: decodedResult.result.format.formatName.includes('QR') ? 'QR Code' : 'Barcode'
       });
       
-      // Stop scanning
-      html5QrcodeScanner.clear();
+      // Stop scanning temporarily
+      if (html5QrcodeScanner && isScanning) {
+        html5QrcodeScanner.pause(true);
+      }
       
-      // Restart scanning after 3 seconds
+      // Resume scanning after 3 seconds
       setTimeout(() => {
         resultDiv.style.display = "none";
-        startScanner();
+        if (html5QrcodeScanner && isScanning) {
+          html5QrcodeScanner.resume();
+        }
       }, 3000);
     };
     
@@ -151,17 +262,118 @@
     };
     
     let html5QrcodeScanner;
+    let isScanning = false;
+    
+    // UI Elements
+    const startSection = document.getElementById('start-section');
+    const scannerSection = document.getElementById('scanner-section');
+    const startBtn = document.getElementById('start-camera-btn');
+    const stopBtn = document.getElementById('stop-camera-btn');
+    const restartBtn = document.getElementById('restart-camera-btn');
+    const cameraStatus = document.getElementById('camera-status');
+    
+    // Event Listeners
+    startBtn.addEventListener('click', initializeCamera);
+    stopBtn.addEventListener('click', stopCamera);
+    restartBtn.addEventListener('click', restartCamera);
+    
+    function showStatus(message, type = 'loading') {
+      cameraStatus.className = `camera-status status-${type}`;
+      cameraStatus.innerHTML = message;
+      cameraStatus.style.display = 'block';
+    }
+    
+    function hideStatus() {
+      cameraStatus.style.display = 'none';
+    }
+    
+    function initializeCamera() {
+      startBtn.disabled = true;
+      startBtn.textContent = '🔄 Starting Camera...';
+      showStatus('🔍 Checking camera permissions...', 'loading');
+      
+      // Check basic requirements
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        showStatus('❌ Camera not supported on this device/browser', 'error');
+        resetStartButton();
+        return;
+      }
+      
+      // Check HTTPS (except for localhost)
+      if (location.protocol !== 'https:' && !location.hostname.includes('localhost') && location.hostname !== '127.0.0.1') {
+        showStatus('🔒 HTTPS required for camera access. Your GitHub Pages should use HTTPS automatically.', 'error');
+        resetStartButton();
+        return;
+      }
+      
+      // Request camera permission
+      navigator.mediaDevices.getUserMedia({ 
+        video: { 
+          facingMode: "environment",
+          width: { ideal: 1280 },
+          height: { ideal: 720 }
+        } 
+      })
+      .then(function(stream) {
+        showStatus('✅ Camera access granted! Starting scanner...', 'success');
+        // Stop the test stream
+        stream.getTracks().forEach(track => track.stop());
+        // Start the actual scanner after a brief delay
+        setTimeout(startScanner, 1000);
+      })
+      .catch(function(error) {
+        console.error("Camera access error:", error);
+        handleCameraError(error);
+      });
+    }
+    
+    function handleCameraError(error) {
+      let errorMsg = "❌ Camera access failed: ";
+      
+      switch(error.name) {
+        case 'NotAllowedError':
+          errorMsg += "Permission denied. Please allow camera access and try again.";
+          break;
+        case 'NotFoundError':
+          errorMsg += "No camera found on this device.";
+          break;
+        case 'NotSupportedError':
+          errorMsg += "Camera not supported on this browser.";
+          break;
+        case 'NotReadableError':
+          errorMsg += "Camera is being used by another application.";
+          break;
+        default:
+          errorMsg += error.message || "Unknown error occurred.";
+      }
+      
+      errorMsg += `
+        <br><br>
+        <strong>💡 Troubleshooting:</strong><br>
+        • Make sure you clicked "Allow" for camera permission<br>
+        • Close other apps that might be using the camera<br>
+        • Try refreshing the page<br>
+        • Try a different browser (Chrome recommended)
+      `;
+      
+      showStatus(errorMsg, 'error');
+      resetStartButton();
+    }
+    
+    function resetStartButton() {
+      startBtn.disabled = false;
+      startBtn.textContent = '🎥 Start Camera';
+    }
     
     function startScanner() {
+      if (isScanning) return;
+      
       html5QrcodeScanner = new Html5QrcodeScanner(
         "reader",
         { 
           fps: 10, 
           qrbox: { width: 250, height: 250 },
-          // Enable all supported barcode formats
-          supportedScanTypes: [
-            Html5QrcodeScanType.SCAN_TYPE_CAMERA
-          ],
+          supportedScanTypes: [Html5QrcodeScanType.SCAN_TYPE_CAMERA],
           formatsToSupport: [
             Html5QrcodeSupportedFormats.QR_CODE,
             Html5QrcodeSupportedFormats.UPC_A,
@@ -176,80 +388,58 @@
             Html5QrcodeSupportedFormats.DATA_MATRIX,
             Html5QrcodeSupportedFormats.PDF_417
           ],
-          // Mobile-specific optimizations
           aspectRatio: 1.0,
           disableFlip: false,
-          // Better camera selection for mobile
+          facingMode: "environment",
           experimentalFeatures: {
             useBarCodeDetectorIfSupported: true
-          },
-          // Request back camera on mobile
-          facingMode: "environment"
+          }
         },
         false
       );
       
       html5QrcodeScanner.render(qrCodeSuccessCallback, qrCodeErrorCallback);
+      
+      // Show scanner UI
+      startSection.style.display = 'none';
+      scannerSection.style.display = 'block';
+      isScanning = true;
+      hideStatus();
     }
     
-    // Start the scanner when page loads
-    document.addEventListener('DOMContentLoaded', function() {
-      checkCameraSupport();
-    });
-    
-    function checkCameraSupport() {
-      // Check if camera is supported
-      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-        showError("Camera not supported on this device/browser");
-        return;
-      }
-      
-      // Check for HTTPS (required for camera access)
-      if (location.protocol !== 'https:' && location.hostname !== 'localhost') {
-        showError("Camera requires HTTPS connection. Please use https:// or localhost");
-        return;
-      }
-      
-      // Request camera permission first
-      navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
-        .then(function(stream) {
-          // Stop the test stream
-          stream.getTracks().forEach(track => track.stop());
-          // Start the actual scanner
-          setTimeout(startScanner, 500);
-        })
-        .catch(function(error) {
-          console.error("Camera access error:", error);
-          let errorMsg = "Camera access denied. ";
-          
-          if (error.name === 'NotAllowedError') {
-            errorMsg += "Please allow camera access and refresh the page.";
-          } else if (error.name === 'NotFoundError') {
-            errorMsg += "No camera found on this device.";
-          } else if (error.name === 'NotSupportedError') {
-            errorMsg += "Camera not supported on this browser.";
-          } else {
-            errorMsg += "Please check camera permissions and try again.";
-          }
-          
-          showError(errorMsg);
+    function stopCamera() {
+      if (html5QrcodeScanner && isScanning) {
+        html5QrcodeScanner.clear().then(() => {
+          console.log('Scanner stopped successfully');
+        }).catch(err => {
+          console.error('Error stopping scanner:', err);
         });
+      }
+      
+      // Show start UI
+      scannerSection.style.display = 'none';
+      startSection.style.display = 'block';
+      isScanning = false;
+      resetStartButton();
+      hideStatus();
     }
     
-    function showError(message) {
-      document.querySelector('.status').innerHTML = `
-        <div style="color: #f44336; background: #ffebee; padding: 15px; border-radius: 8px; margin: 10px 0;">
-          <strong>⚠️ ${message}</strong><br>
-          <small style="display: block; margin-top: 10px;">
-            Troubleshooting tips:<br>
-            • Make sure you're using HTTPS<br>
-            • Allow camera permissions<br>
-            • Try a different browser<br>
-            • Check if camera is used by another app
-          </small>
-        </div>
-      `;
+    function restartCamera() {
+      if (html5QrcodeScanner && isScanning) {
+        html5QrcodeScanner.clear().then(() => {
+          setTimeout(startScanner, 500);
+        }).catch(err => {
+          console.error('Error restarting scanner:', err);
+          stopCamera();
+        });
+      }
     }
+    
+    // Initialize when page loads
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log('Page loaded, scanner ready');
+      // Don't auto-start, wait for user interaction
+    });
     
     // Handle page visibility changes (mobile browsers often pause camera when tab not active)
     document.addEventListener('visibilitychange', function() {
