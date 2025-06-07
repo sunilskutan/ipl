@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>QR Scan Viewer</title>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js"></script>
+</head>
+<body>
+  <h2>Latest Scanned Data:</h2>
+  <div id="scan-result" style="font-size: 1.5em; color: darkgreen;">Waiting...</div>
+
+  <script>
+   const firebaseConfig = {
+  apiKey: "AIzaSyAZDZphWJ86vZcNDzYwXKR7biW-f9AyLG4",
+  authDomain: "universitymodule-8fac5.firebaseapp.com",
+  projectId: "universitymodule-8fac5",
+  storageBucket: "universitymodule-8fac5.firebasestorage.app",
+  messagingSenderId: "154631878754",
+  appId: "1:154631878754:web:7243c8fe784abc1626393b",
+  measurementId: "G-8TJ9ZWEK6M"
+};
+
+    const app = firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    const scanRef = firebase.database().ref("scans/scanData");
+
+    scanRef.on("value", (snapshot) => {
+      const data = snapshot.val();
+      document.getElementById("scan-result").textContent = data || "No scan yet.";
+    });
+  </script>
+</body>
+</html>
