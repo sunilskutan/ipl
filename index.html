@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+    <!DOCTYPE html>
 <html>
 <head>
   <title>QR Code Scanner</title>
@@ -13,7 +13,7 @@
   <div id="result" style="text-align: center; font-size: 1.2em; margin-top: 10px;"></div>
 
   <script>
-     const firebaseConfig = {
+    const firebaseConfig = {
   apiKey: "AIzaSyAZDZphWJ86vZcNDzYwXKR7biW-f9AyLG4",
   authDomain: "universitymodule-8fac5.firebaseapp.com",
   projectId: "universitymodule-8fac5",
@@ -29,7 +29,6 @@
     const qrCodeSuccessCallback = (decodedText, decodedResult) => {
       document.getElementById("result").textContent = "Scanned: " + decodedText;
 
-      // Update Firebase
       firebase.database().ref("scans").set({
         scanData: decodedText
       });
@@ -37,12 +36,18 @@
       html5QrcodeScanner.clear(); // stop scanning
     };
 
+    const qrCodeErrorCallback = (errorMessage) => {
+      // You can log errors here if needed
+      console.log("QR error:", errorMessage);
+    };
+
     const html5QrcodeScanner = new Html5QrcodeScanner(
-      "reader", 
+      "reader",
       { fps: 10, qrbox: { width: 250, height: 250 } },
-      /* verbose= */ false
+      false
     );
-    html5QrcodeScanner.render(qrCodeSuccessCallback);
+
+    html5QrcodeScanner.render(qrCodeSuccessCallback, qrCodeErrorCallback);
   </script>
 </body>
 </html>
