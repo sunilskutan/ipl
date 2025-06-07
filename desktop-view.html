@@ -1,33 +1,383 @@
+
 <!DOCTYPE html>
 <html>
 <head>
-  <title>QR Scan Viewer</title>
+  <title>QR & Barcode Scan Viewer</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background-color: #f5f5f5;
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    h2 {
+      text-align: center;
+      color: #333;
+      margin-bottom: 30px;
+    }
+    .latest-scan {
+      background: linear-gradient(135deg, #4CAF50, #45a047);
+      color: white;
+      padding: 20px;
+      border-radius: 10px;
+      margin-bottom: 30px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    .latest-scan h3 {
+      margin-top: 0;
+      font-size: 1.2em;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .scan-badge {
+      background: rgba(255,255,255,0.2);
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.8em;
+      font-weight: bold;
+    }
+    .scan-data {
+      font-size: 1.4em;
+      font-weight: bold;
+      word-wrap: break-word;
+      margin: 15px 0;
+    }
+    .scan-meta {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 10px;
+      margin-top: 15px;
+      font-size: 0.9em;
+    }
+    .meta-item {
+      background: rgba(255,255,255,0.1);
+      padding: 8px 12px;
+      border-radius: 6px;
+    }
+    .scan-history {
+      margin-top: 30px;
+    }
+    .scan-history h3 {
+      color: #333;
+      border-bottom: 2px solid #4CAF50;
+      padding-bottom: 10px;
+    }
+    .history-item {
+      background: #f9f9f9;
+      border-left: 4px solid #4CAF50;
+      padding: 15px;
+      margin-bottom: 10px;
+      border-radius: 0 8px 8px 0;
+      transition: transform 0.2s;
+    }
+    .history-item:hover {
+      transform: translateX(5px);
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    .history-data {
+      font-size: 1.1em;
+      font-weight: bold;
+      color: #333;
+      word-wrap: break-word;
+      margin-bottom: 8px;
+    }
+    .history-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+      font-size: 0.85em;
+      color: #666;
+    }
+    .no-data {
+      text-align: center;
+      color: #999;
+      font-style: italic;
+      padding: 40px;
+      background: #f9f9f9;
+      border-radius: 8px;
+    }
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 15px;
+      margin-bottom: 30px;
+    }
+    .stat-card {
+      background: #fff;
+      border: 2px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 15px;
+      text-align: center;
+      transition: border-color 0.3s;
+    }
+    .stat-card:hover {
+      border-color: #4CAF50;
+    }
+    .stat-number {
+      font-size: 1.8em;
+      font-weight: bold;
+      color: #4CAF50;
+    }
+    .stat-label {
+      font-size: 0.9em;
+      color: #666;
+      margin-top: 5px;
+    }
+    .clear-btn {
+      background: #f44336;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.9em;
+      margin-top: 20px;
+      transition: background 0.3s;
+    }
+    .clear-btn:hover {
+      background: #d32f2f;
+    }
+    @media (max-width: 600px) {
+      .scan-meta {
+        grid-template-columns: 1fr;
+      }
+      .history-meta {
+        flex-direction: column;
+        gap: 5px;
+      }
+    }
+  </style>
 </head>
 <body>
-  <h2>Latest Scanned Data:</h2>
-  <div id="scan-result" style="font-size: 1.5em; color: darkgreen;">Waiting...</div>
+  <div class="container">
+    <h2>📱 QR & Barcode Scan Viewer</h2>
+    
+    <div class="stats" id="stats">
+      <div class="stat-card">
+        <div class="stat-number" id="total-scans">0</div>
+        <div class="stat-label">Total Scans</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number" id="qr-count">0</div>
+        <div class="stat-label">QR Codes</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number" id="barcode-count">0</div>
+        <div class="stat-label">Barcodes</div>
+      </div>
+    </div>
+
+    <div id="latest-scan" class="no-data">
+      Waiting for scan data...
+    </div>
+
+    <div class="scan-history">
+      <h3>📋 Scan History</h3>
+      <div id="history-list" class="no-data">
+        No scans yet.
+      </div>
+      <button class="clear-btn" onclick="clearHistory()" id="clear-btn" style="display: none;">
+        🗑️ Clear History
+      </button>
+    </div>
+  </div>
 
   <script>
-   const firebaseConfig = {
-  apiKey: "AIzaSyAZDZphWJ86vZcNDzYwXKR7biW-f9AyLG4",
-  authDomain: "universitymodule-8fac5.firebaseapp.com",
-  projectId: "universitymodule-8fac5",
-  storageBucket: "universitymodule-8fac5.firebasestorage.app",
-  messagingSenderId: "154631878754",
-  appId: "1:154631878754:web:7243c8fe784abc1626393b",
-  measurementId: "G-8TJ9ZWEK6M"
-};
-
+    const firebaseConfig = {
+      apiKey: "AIzaSyAZDZphWJ86vZcNDzYwXKR7biW-f9AyLG4",
+      authDomain: "universitymodule-8fac5.firebaseapp.com",
+      projectId: "universitymodule-8fac5",
+      storageBucket: "universitymodule-8fac5.firebasestorage.app",
+      messagingSenderId: "154631878754",
+      appId: "1:154631878754:web:7243c8fe784abc1626393b",
+      measurementId: "G-8TJ9ZWEK6M"
+    };
+    
     const app = firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
-
-    const scanRef = firebase.database().ref("scans/scanData");
-
-    scanRef.on("value", (snapshot) => {
+    const scansRef = firebase.database().ref("scans");
+    
+    let allScans = [];
+    
+    function formatTimestamp(timestamp) {
+      if (!timestamp) return 'Unknown time';
+      const date = new Date(timestamp);
+      return date.toLocaleString();
+    }
+    
+    function getTimeAgo(timestamp) {
+      if (!timestamp) return '';
+      const now = new Date();
+      const scanTime = new Date(timestamp);
+      const diffMs = now - scanTime;
+      const diffMins = Math.floor(diffMs / 60000);
+      const diffHours = Math.floor(diffMs / 3600000);
+      const diffDays = Math.floor(diffMs / 86400000);
+      
+      if (diffMins < 1) return 'Just now';
+      if (diffMins < 60) return `${diffMins} min ago`;
+      if (diffHours < 24) return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`;
+      return `${diffDays} day${diffDays > 1 ? 's' : ''} ago`;
+    }
+    
+    function isUrl(string) {
+      try {
+        new URL(string);
+        return true;
+      } catch (_) {
+        return false;
+      }
+    }
+    
+    function formatScanData(data) {
+      if (isUrl(data)) {
+        return `<a href="${data}" target="_blank" style="color: inherit; text-decoration: underline;">${data}</a>`;
+      }
+      return data;
+    }
+    
+    function updateStats() {
+      const totalScans = allScans.length;
+      const qrCount = allScans.filter(scan => scan.scanType === 'QR Code').length;
+      const barcodeCount = allScans.filter(scan => scan.scanType === 'Barcode').length;
+      
+      document.getElementById('total-scans').textContent = totalScans;
+      document.getElementById('qr-count').textContent = qrCount;
+      document.getElementById('barcode-count').textContent = barcodeCount;
+    }
+    
+    function updateLatestScan() {
+      const latestScanDiv = document.getElementById('latest-scan');
+      
+      if (allScans.length === 0) {
+        latestScanDiv.className = 'no-data';
+        latestScanDiv.innerHTML = 'Waiting for scan data...';
+        return;
+      }
+      
+      // Get the most recent scan
+      const latest = allScans[0];
+      
+      latestScanDiv.className = 'latest-scan';
+      latestScanDiv.innerHTML = `
+        <h3>
+          Latest Scan 
+          <span class="scan-badge">${latest.scanType || 'Unknown'}</span>
+        </h3>
+        <div class="scan-data">${formatScanData(latest.scanData || 'No data')}</div>
+        <div class="scan-meta">
+          <div class="meta-item">
+            <strong>Format:</strong> ${latest.format || 'Unknown'}
+          </div>
+          <div class="meta-item">
+            <strong>Time:</strong> ${getTimeAgo(latest.timestamp)}
+          </div>
+          <div class="meta-item">
+            <strong>Full Date:</strong> ${formatTimestamp(latest.timestamp)}
+          </div>
+        </div>
+      `;
+    }
+    
+    function updateHistory() {
+      const historyDiv = document.getElementById('history-list');
+      const clearBtn = document.getElementById('clear-btn');
+      
+      if (allScans.length === 0) {
+        historyDiv.className = 'no-data';
+        historyDiv.innerHTML = 'No scans yet.';
+        clearBtn.style.display = 'none';
+        return;
+      }
+      
+      clearBtn.style.display = 'block';
+      historyDiv.className = '';
+      
+      // Show up to 20 most recent scans
+      const recentScans = allScans.slice(0, 20);
+      
+      historyDiv.innerHTML = recentScans.map((scan, index) => `
+        <div class="history-item">
+          <div class="history-data">${formatScanData(scan.scanData || 'No data')}</div>
+          <div class="history-meta">
+            <span><strong>Type:</strong> ${scan.scanType || 'Unknown'}</span>
+            <span><strong>Format:</strong> ${scan.format || 'Unknown'}</span>
+            <span><strong>Time:</strong> ${getTimeAgo(scan.timestamp)}</span>
+          </div>
+        </div>
+      `).join('');
+    }
+    
+    function clearHistory() {
+      if (confirm('Are you sure you want to clear all scan history?')) {
+        scansRef.remove().then(() => {
+          console.log('History cleared successfully');
+        }).catch((error) => {
+          console.error('Error clearing history:', error);
+          alert('Error clearing history. Please try again.');
+        });
+      }
+    }
+    
+    // Listen for changes to the scans data
+    scansRef.on("value", (snapshot) => {
       const data = snapshot.val();
-      document.getElementById("scan-result").textContent = data || "No scan yet.";
+      allScans = [];
+      
+      if (data) {
+        // Handle both old format (single scan) and new format (multiple scans)
+        if (data.scanData && typeof data.scanData === 'string') {
+          // Old format - single scan
+          allScans.push({
+            scanData: data.scanData,
+            format: data.format || 'Unknown',
+            scanType: 'QR Code', // Assume QR code for old data
+            timestamp: data.timestamp || new Date().toISOString()
+          });
+        } else {
+          // New format - multiple scans
+          Object.keys(data).forEach(key => {
+            if (data[key] && typeof data[key] === 'object') {
+              allScans.push({
+                key: key,
+                scanData: data[key].scanData,
+                format: data[key].format || 'Unknown',
+                scanType: data[key].scanType || 'Unknown',
+                timestamp: data[key].timestamp || new Date().toISOString()
+              });
+            }
+          });
+          
+          // Sort by timestamp (most recent first)
+          allScans.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+        }
+      }
+      
+      updateStats();
+      updateLatestScan();
+      updateHistory();
+    });
+    
+    // Handle connection status
+    const connectedRef = firebase.database().ref(".info/connected");
+    connectedRef.on("value", (snap) => {
+      if (snap.val() === true) {
+        console.log("Connected to Firebase");
+      } else {
+        console.log("Disconnected from Firebase");
+      }
     });
   </script>
 </body>
