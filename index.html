@@ -23,19 +23,34 @@
 };
     firebase.initializeApp(firebaseConfig);
 
-    const session = new URLSearchParams(location.search).get("session") || "defaultSession";
+  const session = new URLSearchParams(location.search).get("session") || "defaultSession";
 
-    function onScanSuccess(decodedText) {
-      firebase.database().ref("sessions/" + session).set({
-        value: decodedText,
-        timestamp: Date.now()
-      }).then(() => {
-        alert("Data sent: " + decodedText);
-      });
-    }
+  function onScanSuccess(decodedText, decodedResult) {
+    // STOP the scanner after success
+    html5QrcodeScanner.clear().then(() => {
+      console.log("Scanner stopped after scan.");
+    }).catch(err => {
+      console.error("Failed to stop scanner: ", err);
+    });
 
-    const qrScanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: 250 });
-    qrScanner.render(onScanSuccess);
+    // SEND data to Firebase
+    firebase.database().ref("sessions/" + session).set({
+      value: decodedText,
+      timestamp: Date.now()
+    }).then(() => {
+      alert("Scanned and sent: " + decodedText);
+    }).catch(error => {
+      alert("Error sending to Firebase: " + error);
+    });
+const beep = new Audio('https://actions.google.com/sounds/v1/alarms/beep_short.ogg');
+beep.play();
+  }
+
+  const html5QrcodeScanner = new Html5QrcodeScanner("reader", {
+    fps: 10,
+    qrbox: 250
+  });
+  html5QrcodeScanner.render(onScanSuccess);
   </script>
 </body>
 </html>
