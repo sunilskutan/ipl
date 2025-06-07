@@ -1,53 +1,208 @@
-    <!DOCTYPE html>
+<!DOCTYPE html>
 <html>
 <head>
-  <title>QR Code Scanner</title>
+  <title>QR Code & Barcode Scanner</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <script src="https://unpkg.com/html5-qrcode@2.3.8/minified/html5-qrcode.min.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background-color: #f5f5f5;
+    }
+    .container {
+      max-width: 400px;
+      margin: 0 auto;
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    h2 {
+      text-align: center;
+      color: #333;
+      margin-bottom: 20px;
+    }
+    #reader {
+      width: 100%;
+      max-width: 350px;
+      margin: auto;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    #result {
+      text-align: center;
+      font-size: 1.2em;
+      margin-top: 20px;
+      padding: 15px;
+      background-color: #e8f5e8;
+      border-radius: 8px;
+      border: 2px solid #4CAF50;
+      word-wrap: break-word;
+      display: none;
+    }
+    .status {
+      text-align: center;
+      margin-top: 10px;
+      color: #666;
+      font-size: 0.9em;
+    }
+    .supported-formats {
+      margin-top: 20px;
+      padding: 15px;
+      background-color: #f0f8ff;
+      border-radius: 8px;
+      font-size: 0.85em;
+    }
+    .supported-formats h4 {
+      margin-top: 0;
+      color: #333;
+    }
+    .formats-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 5px;
+      margin-top: 10px;
+    }
+    .format-item {
+      background: white;
+      padding: 5px 8px;
+      border-radius: 4px;
+      text-align: center;
+      font-size: 0.8em;
+    }
+  </style>
 </head>
 <body>
-  <h2>Scan QR Code</h2>
-  <div id="reader" style="width: 300px; margin:auto;"></div>
-  <div id="result" style="text-align: center; font-size: 1.2em; margin-top: 10px;"></div>
+  <div class="container">
+    <h2>QR Code & Barcode Scanner</h2>
+    <div id="reader"></div>
+    <div class="status">Position camera over QR code or barcode</div>
+    <div id="result"></div>
+    
+    <div class="supported-formats">
+      <h4>Supported Formats:</h4>
+      <div class="formats-grid">
+        <div class="format-item">QR Code</div>
+        <div class="format-item">UPC-A</div>
+        <div class="format-item">UPC-E</div>
+        <div class="format-item">EAN-8</div>
+        <div class="format-item">EAN-13</div>
+        <div class="format-item">Code 128</div>
+        <div class="format-item">Code 39</div>
+        <div class="format-item">Code 93</div>
+        <div class="format-item">Codabar</div>
+        <div class="format-item">ITF</div>
+        <div class="format-item">Data Matrix</div>
+        <div class="format-item">PDF417</div>
+      </div>
+    </div>
+  </div>
 
   <script>
     const firebaseConfig = {
-  apiKey: "AIzaSyAZDZphWJ86vZcNDzYwXKR7biW-f9AyLG4",
-  authDomain: "universitymodule-8fac5.firebaseapp.com",
-  projectId: "universitymodule-8fac5",
-  storageBucket: "universitymodule-8fac5.firebasestorage.app",
-  messagingSenderId: "154631878754",
-  appId: "1:154631878754:web:7243c8fe784abc1626393b",
-  measurementId: "G-8TJ9ZWEK6M"
-};
-
+      apiKey: "AIzaSyAZDZphWJ86vZcNDzYwXKR7biW-f9AyLG4",
+      authDomain: "universitymodule-8fac5.firebaseapp.com",
+      projectId: "universitymodule-8fac5",
+      storageBucket: "universitymodule-8fac5.firebasestorage.app",
+      messagingSenderId: "154631878754",
+      appId: "1:154631878754:web:7243c8fe784abc1626393b",
+      measurementId: "G-8TJ9ZWEK6M"
+    };
+    
     const app = firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
-
+    
     const qrCodeSuccessCallback = (decodedText, decodedResult) => {
-      document.getElementById("result").textContent = "Scanned: " + decodedText;
-
-      firebase.database().ref("scans").set({
-        scanData: decodedText
+      // Show the result
+      const resultDiv = document.getElementById("result");
+      resultDiv.innerHTML = `
+        <strong>Scanned Successfully!</strong><br>
+        <strong>Format:</strong> ${decodedResult.result.format.formatName}<br>
+        <strong>Data:</strong> ${decodedText}
+      `;
+      resultDiv.style.display = "block";
+      
+      // Save to Firebase with timestamp and format info
+      const timestamp = new Date().toISOString();
+      firebase.database().ref("scans").push({
+        scanData: decodedText,
+        format: decodedResult.result.format.formatName,
+        timestamp: timestamp,
+        scanType: decodedResult.result.format.formatName.includes('QR') ? 'QR Code' : 'Barcode'
       });
-
-      html5QrcodeScanner.clear(); // stop scanning
+      
+      // Stop scanning
+      html5QrcodeScanner.clear();
+      
+      // Restart scanning after 3 seconds
+      setTimeout(() => {
+        resultDiv.style.display = "none";
+        startScanner();
+      }, 3000);
     };
-
+    
     const qrCodeErrorCallback = (errorMessage) => {
-      // You can log errors here if needed
-      console.log("QR error:", errorMessage);
+      // Only log errors, don't show them to user as they're frequent during scanning
+      console.log("Scan error:", errorMessage);
     };
-
-    const html5QrcodeScanner = new Html5QrcodeScanner(
-      "reader",
-      { fps: 10, qrbox: { width: 250, height: 250 } },
-      false
-    );
-
-    html5QrcodeScanner.render(qrCodeSuccessCallback, qrCodeErrorCallback);
+    
+    let html5QrcodeScanner;
+    
+    function startScanner() {
+      html5QrcodeScanner = new Html5QrcodeScanner(
+        "reader",
+        { 
+          fps: 10, 
+          qrbox: { width: 250, height: 250 },
+          // Enable all supported barcode formats
+          supportedScanTypes: [
+            Html5QrcodeScanType.SCAN_TYPE_CAMERA
+          ],
+          formatsToSupport: [
+            Html5QrcodeSupportedFormats.QR_CODE,
+            Html5QrcodeSupportedFormats.UPC_A,
+            Html5QrcodeSupportedFormats.UPC_E,
+            Html5QrcodeSupportedFormats.EAN_8,
+            Html5QrcodeSupportedFormats.EAN_13,
+            Html5QrcodeSupportedFormats.CODE_128,
+            Html5QrcodeSupportedFormats.CODE_39,
+            Html5QrcodeSupportedFormats.CODE_93,
+            Html5QrcodeSupportedFormats.CODABAR,
+            Html5QrcodeSupportedFormats.ITF,
+            Html5QrcodeSupportedFormats.DATA_MATRIX,
+            Html5QrcodeSupportedFormats.PDF_417
+          ],
+          // Mobile-specific optimizations
+          aspectRatio: 1.0,
+          disableFlip: false,
+          // Better camera selection for mobile
+          experimentalFeatures: {
+            useBarCodeDetectorIfSupported: true
+          }
+        },
+        false
+      );
+      
+      html5QrcodeScanner.render(qrCodeSuccessCallback, qrCodeErrorCallback);
+    }
+    
+    // Start the scanner when page loads
+    startScanner();
+    
+    // Handle page visibility changes (mobile browsers often pause camera when tab not active)
+    document.addEventListener('visibilitychange', function() {
+      if (document.hidden) {
+        // Page is hidden, scanner will pause automatically
+        console.log('Scanner paused - page hidden');
+      } else {
+        // Page is visible again
+        console.log('Scanner resumed - page visible');
+      }
+    });
   </script>
 </body>
 </html>
