@@ -1,67 +1,87 @@
-
-  <!DOCTYPE html>
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Mobile QR Scanner</title>
+
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
+  <!-- QR Scanner -->
   <script src="https://unpkg.com/html5-qrcode"></script>
 
-<!-- Load Firestore SDK -->
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
-<script src="https://unpkg.com/html5-qrcode"></script>
-
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background: #f2f2f2;
+    }
+    h3 {
+      margin-top: 1em;
+      color: #333;
+    }
+    #reader {
+      width: 90vw;
+      max-width: 400px;
+      margin: 1em auto;
+    }
+    @media print {
+      #reader {
+        display: none;
+      }
+    }
+  </style>
 </head>
 <body>
-  <h3>Scan QR Code (Mobile)</h3>
-  <div id="reader" style="width:300px;"></div>
+
+  <h3>📷 Scan QR Code</h3>
+  <div id="reader"></div>
 
   <script>
-   const firebaseConfig = {
-  apiKey: "AIzaSyAZDZphWJ86vZcNDzYwXKR7biW-f9AyLG4",
-  authDomain: "universitymodule-8fac5.firebaseapp.com",
-  projectId: "universitymodule-8fac5",
-  storageBucket: "universitymodule-8fac5.firebasestorage.app",
-  messagingSenderId: "154631878754",
-  appId: "1:154631878754:web:7243c8fe784abc1626393b",
-  measurementId: "G-8TJ9ZWEK6M"
-};
-  
- // Initialize Firebase & Firestore
-  firebase.initializeApp(firebaseConfig);
-  const db = firebase.firestore();
+    // Firebase Config
+    const firebaseConfig = {
+      apiKey: "AIzaSyAZDZphWJ86vZcNDzYwXKR7biW-f9AyLG4",
+      authDomain: "universitymodule-8fac5.firebaseapp.com",
+      projectId: "universitymodule-8fac5",
+      storageBucket: "universitymodule-8fac5.firebasestorage.app",
+      messagingSenderId: "154631878754",
+      appId: "1:154631878754:web:7243c8fe784abc1626393b",
+      measurementId: "G-8TJ9ZWEK6M"
+    };
 
-  // Read session from URL
-  const session = new URLSearchParams(location.search).get("session") || "defaultSession";
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
 
-  // On QR Code success
-  function onScanSuccess(decodedText, decodedResult) {
-    html5QrcodeScanner.clear().then(() => {
-      console.log("Scanner stopped after scan.");
+    const session = new URLSearchParams(location.search).get("session") || "defaultSession";
+
+    function onScanSuccess(decodedText, decodedResult) {
+      html5QrcodeScanner.clear().then(() => {
+        console.log("Scanner stopped.");
+      });
+
+      const beep = new Audio("data:audio/ogg;base64,T2dnUwACAAAAAAAAAABVDx8EAAAAAEWljC4BHgF2b3JiaXMAAAAAAkSsAAAAAAAALmP//////////////////+5BTUUzLjEwAAGccAAAABhBTUUzLjEwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==");
+      beep.play();
+
+      db.collection("scans").doc(session).set({
+        value: decodedText,
+        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+      }).then(() => {
+        alert("✅ Data sent: " + decodedText);
+      }).catch((error) => {
+        alert("❌ Firestore Error: " + error);
+      });
+    }
+
+    const html5QrcodeScanner = new Html5QrcodeScanner("reader", {
+      fps: 10,
+      qrbox: { width: 250, height: 250 }
     });
-
-const beep = new Audio('https://actions.google.com/sounds/v1/alarms/beep_short.ogg');
-beep.play();
-
-
-    // Save to Firestore
-    db.collection("scans").doc(session).set({
-      value: decodedText,
-      timestamp: firebase.firestore.FieldValue.serverTimestamp()
-    }).then(() => {
-      alert("Data sent to Firestore: " + decodedText);
-    }).catch((error) => {
-      alert("Error writing to Firestore: " + error);
-    });
-  }
-
-  // Start the QR Scanner
-  const html5QrcodeScanner = new Html5QrcodeScanner("reader", {
-    fps: 10,
-    qrbox: 250
-  });
-  html5QrcodeScanner.render(onScanSuccess);
-</script>
-
+    html5QrcodeScanner.render(onScanSuccess);
+  </script>
 
 </body>
 </html>
