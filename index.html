@@ -58,29 +58,55 @@
 
     const session = new URLSearchParams(location.search).get("session") || "defaultSession";
 
-    function onScanSuccess(decodedText, decodedResult) {
-      html5QrcodeScanner.clear().then(() => {
-        console.log("Scanner stopped.");
+    // Preload beep audio
+    const beep = new Audio('https://actions.google.com/sounds/v1/alarms/beep_short.ogg');
+    beep.preload = 'auto';
+
+    // Create scanner
+    const html5QrCode = new Html5Qrcode("reader");
+
+    function startScanner() {
+      html5QrCode.start(
+        { facingMode: "environment" }, // rear camera
+        {
+          fps: 10,
+          qrbox: { width: 250, height: 250 }
+        },
+        onScanSuccess,
+        (errorMessage) => {
+          // Ignore scan errors
+        }
+      ).catch(err => {
+        alert("Camera start error: " + err);
       });
+    }
 
-     const beep = new Audio('https://actions.google.com/sounds/v1/alarms/beep_short.ogg');
-   beep.play();
+    function onScanSuccess(decodedText, decodedResult) {
+      // Pause scanning
+      html5QrCode.pause();
 
+      // Play beep immediately
+      beep.currentTime = 0;
+      beep.play();
+
+      // Write to Firestore
       db.collection("scans").doc(session).set({
         value: decodedText,
         timestamp: firebase.firestore.FieldValue.serverTimestamp()
       }).then(() => {
-        alert("✅ Data sent: " + decodedText);
+        console.log("✅ Data sent: " + decodedText);
       }).catch((error) => {
         alert("❌ Firestore Error: " + error);
+      }).finally(() => {
+        // Resume scanning after 1.5 seconds
+        setTimeout(() => {
+          html5QrCode.resume();
+        }, 1500);
       });
     }
 
-    const html5QrcodeScanner = new Html5QrcodeScanner("reader", {
-      fps: 10,
-      qrbox: { width: 250, height: 250 }
-    });
-    html5QrcodeScanner.render(onScanSuccess);
+    // Start the scanner when page loads
+    startScanner();
   </script>
 
 </body>
