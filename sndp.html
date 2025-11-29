@@ -1,0 +1,494 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      let titleText = "🪔 SNDP Erunnootty Mullakkara Branch. 🙏 Welcome! ";
+      let index = 0;
+      setInterval(() => {
+        document.title = titleText.slice(index) + titleText.slice(0, index);
+        index = (index + 1) % titleText.length;
+      }, 150);
+    });
+  </script>
+  <meta name="description" content="SNDP Yogam - Erunnootty Mullakkara Branch | Community, Culture, Service" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Noto+Sans+Malayalam:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #f59e0b;
+      --primary-dark: #d97706;
+      --primary-light: #fbbf24;
+      --accent: #92400e;
+    }
+    body { font-family: 'Inter', system-ui, sans-serif; }
+    body[lang="ml"], body[lang="ml"] * { font-family: 'Noto Sans Malayalam', 'Inter', sans-serif; }
+    .hero-bg { background: linear-gradient(135deg, rgba(245,158,11,0.15), rgba(217,119,6,0.1)); }
+    .floating { animation: floating 4s ease-in-out infinite; }
+    @keyframes floating { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+    .gradient-text {
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    /* Mobile-first adjustments */
+    .text-mobile-lg { font-size: 1.8rem; }
+    @media (min-width: 640px) { .text-mobile-lg { font-size: 2.5rem; } }
+  </style>
+</head>
+<body class="bg-gradient-to-br from-amber-50 via-yellow-50 to-orange-50 text-gray-800 text-sm leading-relaxed min-h-screen">
+  <!-- Navigation -->
+  <header class="bg-white/90 backdrop-blur-md shadow-md sticky top-0 z-50 border-b border-amber-200">
+    <div class="container mx-auto px-4 py-3 flex items-center justify-between">
+      <a href="#" class="flex items-center gap-2">
+        <div class="w-10 h-10 rounded-full overflow-hidden ring-2 ring-amber-300 shadow-md">
+          <img src="https://admin.sivagiri.com/uploads/photos/1657866201_5024ea3be894fef092cd.jpg" alt="Guru" class="w-full h-full object-cover">
+        </div>
+        <div>
+          <h1 class="text-sm font-bold gradient-text" data-en="SNDP Erunnootty Mullakkara" data-ml="എസ്.എൻ.ഡി.പി ഇരുന്നൂട്ടി മുല്ലക്കര">SNDP Erunnootty Mullakkara</h1>
+          <p class="text-xs text-amber-700" data-en="Sree Narayana Yogam" data-ml="ശ്രീ നാരായണ യോഗം">Sree Narayana Yogam</p>
+        </div>
+      </a>
+      <div class="flex items-center gap-2">
+        <button id="langToggle" class="px-3 py-1.5 text-xs rounded-full bg-gradient-to-r from-amber-400 to-yellow-400 text-amber-900 font-semibold shadow">
+          <span class="flex items-center gap-1">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"/></svg>
+            മലയാളം
+          </span>
+        </button>
+        <button id="menuBtn" class="p-2">
+          <svg class="w-5 h-5 text-amber-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+        </button>
+      </div>
+    </div>
+    <!-- Mobile Menu -->
+    <div id="mobileMenu" class="hidden bg-amber-50 border-t border-amber-200">
+      <div class="px-4 py-3 space-y-2 text-sm font-medium">
+        <a href="#about" class="block py-2 hover:text-amber-600" data-en="About" data-ml="ഞങ്ങളെക്കുറിച്ച്">About</a>
+        <a href="#events" class="block py-2 hover:text-amber-600" data-en="Events" data-ml="പരിപാടികൾ">Events</a>
+        <a href="#gallery" class="block py-2 hover:text-amber-600" data-en="Gallery" data-ml="ഗാലറി">Gallery</a>
+        <a href="#membership" class="block py-2 hover:text-amber-600" data-en="Membership" data-ml="അംഗത്വം">Membership</a>
+        <a href="#contact" class="block py-2 hover:text-amber-600" data-en="Contact" data-ml="ബന്ധപ്പെടുക">Contact</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <main class="container mx-auto px-4 py-6">
+    <section class="hero-bg rounded-2xl p-6 shadow-xl border border-amber-200">
+      <div class="text-center mb-6">
+        <span class="inline-block px-3 py-1 rounded-full bg-amber-200 text-amber-900 text-xs font-semibold mb-3">
+          <span data-en="🪔 Serving Community" data-ml="🪔 സമൂഹ സേവനം">🪔 Serving Community</span>
+        </span>
+        <h2 class="text-mobile-lg font-extrabold gradient-text leading-tight" data-en="SNDP Erunnootty Mullakkara Branch" data-ml="എസ്.എൻ.ഡി.പി ഇരുന്നൂട്ടി മുല്ലക്കര ശാഖ">
+          SNDP Erunnootty Mullakkara Branch
+        </h2>
+        <p class="mt-3 text-gray-700 text-sm" data-en="Community of service, education & culture ." data-ml=" സേവനം, വിദ്യാഭ്യാസം, സാംസ്കാരിക സംരക്ഷണം.">Community of service, education & culture.</p>
+      </div>
+
+      <!-- Compact Audio Player -->
+      <div class="bg-white rounded-xl border border-amber-300 p-4 shadow-md mb-6">
+        <div id="status" class="text-xs font-semibold text-amber-800 flex items-center justify-between mb-2">
+          <div class="flex items-center gap-2">
+            <span id="statusIcon">⏸️</span>
+            <span id="statusText">Ready to play</span>
+          </div>
+          <div id="stopIcon" onclick="stopAudio()" class="hidden bg-red-600 text-white text-xs px-2 py-1 rounded cursor-pointer">STOP</div>
+        </div>
+        <button id="playBtn" onclick="toggleAudio()" class="w-full flex items-center justify-center gap-2 py-2.5 bg-amber-400 text-amber-900 rounded-lg font-semibold text-sm">
+          <svg id="playIcon" class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+          <span id="btnText">Daivadasakam</span>
+        </button>
+        <audio id="anthemAudio"><source src="daivadasakam.mp3" type="audio/mpeg"></audio>
+      </div>
+
+      <!-- YouTube + Buttons -->
+      <div class="space-y-4">
+        <div class="floating bg-white rounded-2xl p-4 shadow-lg border border-amber-200">
+          <h3 class="text-sm font-bold text-amber-900 mb-3" data-en="📢 News" data-ml="📢 വാർത്തകൾ">📢 News</h3>
+          <div class="relative pt-[56.25%] rounded-xl overflow-hidden">
+            <iframe class="absolute inset-0 w-full h-full" src="https://www.youtube.com/embed/8s0oVPopO6o?rel=0" title="News" frameborder="0" allowfullscreen></iframe>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- About -->
+    <section id="about" class="mt-8 bg-white rounded-2xl p-5 shadow-lg border border-amber-200">
+      <h3 class="text-xl font-bold gradient-text mb-4" data-en="About Us" data-ml="ഞങ്ങളെക്കുറിച്ച്">About Us</h3>
+      <p class="text-xs leading-relaxed text-gray-700 mb-4" data-en="Local branch working for social reform, education and cultural preservation." data-ml="സാമൂഹിക പരിഷ്കരണം, വിദ്യാഭ്യാസം, സാംസ്കാരിക സംരക്ഷണം എന്നിവയ്ക്കായി പ്രവർത്തിക്കുന്ന പ്രാദേശിക ശാഖ.">Local branch working for social reform, education and cultural preservation.</p>
+      <div class="grid grid-cols-1 gap-4 text-xs">
+        <div class="p-4 bg-amber-50 rounded-xl border border-amber-300 cursor-pointer" onclick="alert('അംഗങ്ങളുടെ വിവരങ്ങള്‍  ഉടന്‍ചേര്‍ക്കുന്നതാണ്')">
+          <span class="text-xl">🎯</span> <strong data-en="Members" data-ml="അംഗങ്ങള്‍">Members</strong><br><span class="text-gray-600">Under Erunnootty Mullakkara Branch</span>
+        </div>
+        <div class="p-4 bg-amber-50 rounded-xl border border-amber-300 cursor-pointer" onclick="alert('പുതിയ പ്രവർത്തനങ്ങൾ ഉടന്‍ അറിയിക്കുന്നതാണ്')">
+          <span class="text-xl">📚</span> <strong data-en="Activities" data-ml="പ്രവർത്തനങ്ങൾ">Activities</strong><br><span class="text-gray-600">Education, health & cultural programs</span>
+        </div>
+        <div class="p-4 bg-amber-50 rounded-xl border border-amber-300 cursor-pointer" onclick="showOfficeBearers()">
+          <span class="text-xl">🤝</span> <strong data-en="Office Bearers" data-ml="ഭാരവാഹികൾ">Office Bearers</strong><br><span class="text-gray-600">14 Member Committee</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Events -->
+    <section id="events" class="mt-8">
+      <h3 class="text-xl font-bold gradient-text mb-4" data-en="Upcoming Events" data-ml="വരാനിരിക്കുന്ന പരിപാടികൾ">Upcoming Events</h3>
+      <div class="space-y-4">
+        <div class="bg-white p-4 rounded-xl shadow border border-amber-200 flex gap-3">
+          <div class="bg-gradient-to-br from-amber-400 to-yellow-400 text-white w-12 h-12 rounded-lg flex flex-col items-center justify-center text-xs font-bold flex-shrink-0">
+            <span class="text-lg">30</span> DEC
+          </div>
+          <div>
+            <h4 class="font-bold text-amber-900 text-sm" data-en="First Executive Committe Meeting" data-ml="ഭാരവാഹികളുടെ യോഗം ">Executive Committe Meeting</h4>
+            <p class="text-xs text-gray-600">Dec 30, 2025. 4.30pm • Mrs.Sarama's House</p>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Gallery (simplified for mobile) -->
+    <section id="gallery" class="mt-8 bg-white p-5 rounded-2xl shadow-lg border border-amber-200">
+      <h3 class="text-xl font-bold gradient-text mb-4" data-en="Gallery" data-ml="ഗാലറി">Gallery</h3>
+      <div class="grid grid-cols-2 gap-3">
+        <img src="https://live.staticflickr.com/65535/54952836063_2530db7959.jpg" alt="Event" class="rounded-lg shadow border border-amber-200 w-full h-full object-cover">
+      <!--    <img src="https://via.placeholder.com/300?text=Event+2" alt="Event" class="rounded-lg shadow border border-amber-200 w-full h-40 object-cover">
+        <img src="https://via.placeholder.com/300?text=Event+3" alt="Event" class="rounded-lg shadow border border-amber-200 w-full h-40 object-cover">
+        <img src="https://via.placeholder.com/300?text=Event+4" alt="Event" class="rounded-lg shadow border border-amber-200 w-full h-40 object-cover">
+     -->
+      </div>
+    </section>
+
+    <!-- Contact -->
+    <section id="contact" class="mt-8 bg-white p-5 rounded-2xl shadow-lg border border-amber-200">
+      <h3 class="text-xl font-bold gradient-text mb-4" data-en="Contact" data-ml="ബന്ധപ്പെടുക">Contact</h3>
+      <div class="text-xs space-y-3 text-gray-700">
+        <p><strong data-en="Office:" data-ml="ഓഫീസ്:">Office:</strong> SNDP Erunnootty Mullakkara Branch</p>
+      </div>
+      <div class="mt-5 flex gap-3 flex-wrap">
+        <a href="#" class="px-4 py-2 bg-amber-100 rounded-lg text-amber-900 text-xs font-semibold">Facebook</a>
+        <a href="#" class="px-4 py-2 bg-amber-100 rounded-lg text-amber-900 text-xs font-semibold">Instagram</a>
+        <a href="tel:" class="px-4 py-2 bg-amber-100 rounded-lg text-amber-900 text-xs font-semibold" data-en="Call" data-ml="വിളിക്കുക">Call</a>
+      </div>
+      <div class="mt-5">
+        <iframe 
+  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3942.883!2d76.926!3d8.829!2m3!1f0!2f0!3f0!3m2!1i1024!2i1!4f13.1!3m3!1m2!1s0x3b05f6f8c8e8e8e8%3A0xdef456!2sMeenmutti%20Waterfalls%2C%20Kummil%2C%20Kerala%20691536!5e0!3m2!1sen!2sin!4v1735500000000" 
+  class="w-full h-64 md:h-96 rounded-xl border-4 border-amber-300 shadow-lg" 
+  allowfullscreen="" 
+  loading="lazy" 
+  referrerpolicy="no-referrer-when-downgrade">
+</iframe>
+      </div>
+    </section>
+  </main>
+
+  <footer class="mt-10 bg-amber-100 border-t border-amber-300 py-4 text-center text-xs text-amber-900">
+    © <span id="year"></span> SNDP Erunnootty Mullakkara Branch<br>
+    <span data-en="Made for community" data-ml="കമ്മ്യൂണിറ്റിക്കായി നിർമ്മിച്ചത്">Made for community</span>
+  </footer>
+
+  <!-- Scripts (same as original but compacted) -->
+  <script>
+    let isPlaying = false;
+    function toggleAudio() {
+      const audio = document.getElementById('anthemAudio');
+      const playIcon = document.getElementById('playIcon');
+      const btnText = document.getElementById('btnText');
+      const statusIcon = document.getElementById('statusIcon');
+      const statusText = document.getElementById('statusText');
+      const stopIcon = document.getElementById('stopIcon');
+      if (isPlaying) { audio.pause(); } else { audio.play(); }
+    }
+    function stopAudio() {
+      const audio = document.getElementById('anthemAudio');
+      audio.pause(); audio.currentTime = 0;
+      document.getElementById('statusIcon').textContent = '⏸️';
+      document.getElementById('statusText').textContent = 'Ready to play';
+      document.getElementById('playIcon').innerHTML = '<path d="M8 5v14l11-7z"/>';
+      document.getElementById('btnText').textContent = 'Daivadasakam';
+      document.getElementById('stopIcon').classList.add('hidden');
+      isPlaying = false;
+    }
+    document.getElementById('anthemAudio').addEventListener('play', () => {
+      isPlaying = true; document.getElementById('statusIcon').textContent = '▶️';
+      document.getElementById('statusText').textContent = 'Playing';
+      document.getElementById('playIcon').innerHTML = '<path fill-rule="evenodd" d="M6 18L18 6M6 6l12 12"/>';
+      document.getElementById('btnText').textContent = 'Pause';
+      document.getElementById('stopIcon').classList.remove('hidden');
+    });
+    document.getElementById('anthemAudio').addEventListener('pause', () => { if(!isPlaying) stopAudio(); });
+    document.getElementById('anthemAudio').addEventListener('ended', stopAudio);
+
+    // Language Toggle
+    let currentLang = 'en';
+    document.getElementById('langToggle').addEventListener('click', () => {
+      currentLang = currentLang === 'en' ? 'ml' : 'en';
+      document.body.setAttribute('lang', currentLang);
+      document.querySelectorAll('[data-en]').forEach(el => {
+        const key = currentLang === 'en' ? 'data-ml' : 'data-en';
+        const text = el.getAttribute(`data-${currentLang}`);
+        if (text) el.textContent = text;
+      });
+      document.getElementById('langToggle').innerHTML = currentLang === 'en' ?
+        '<span class="flex items-center gap-1"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"/></svg>മലയാളം</span>' :
+        '<span class="flex items-center gap-1"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"/></svg>English</span>';
+    });
+
+    // Mobile menu
+    document.getElementById('menuBtn').addEventListener('click', () => {
+      document.getElementById('mobileMenu').classList.toggle('hidden');
+    });
+
+    // Year
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    // Smooth scroll
+    document.querySelectorAll('a[href^="#"]').forEach(a => {
+      a.addEventListener('click', e => {
+        e.preventDefault();
+        document.querySelector(a.getAttribute('href'))?.scrollIntoView({ behavior: 'smooth' });
+        document.getElementById('mobileMenu').classList.add('hidden');
+      });
+    });
+
+
+//new portion
+// Add your office bearers data here
+const officeBearers = [
+  {
+    name: "Santhosh Kumar.S",
+    role: "President",
+    phone: "9207107745",
+    imageUrl: "https://media-maa3-2.cdn.whatsapp.net/v/t61.24694-24/56153784_290721428490274_930040103835795456_n.jpg?ccb=11-4&oh=01_Q5Aa3AFB-UMaeLNh7rkTwBNZGkJcCd9Tao33tONL8x-HVq4ekA&oe=69377F20&_nc_sid=5e03e0&_nc_cat=109"
+  },
+  {
+    name: "Sasidharan.P",
+    role: "Secretary",
+    phone: "9645741402",
+    imageUrl: "https://media-maa3-2.cdn.whatsapp.net/v/t61.24694-24/543366217_1457279898916030_4631936487318176132_n.jpg?ccb=11-4&oh=01_Q5Aa3AENBJulcfcMpltzg24zCqVwqAs9atZ_9CKEP_iDwHc0Qw&oe=6937A6C0&_nc_sid=5e03e0&_nc_cat=102"
+  },
+  {
+    name: "Ramachandan.S",
+    role: "Vice President",
+    phone: "9567350495",
+    imageUrl: "https://media-maa3-2.cdn.whatsapp.net/v/t61.24694-24/399842155_738413431511514_4012734539139840147_n.jpg?ccb=11-4&oh=01_Q5Aa3AFD8JntpC3YgysYbjxMKjxWJIwQPkvm5nvsygSIlFSdVA&oe=693788B9&_nc_sid=5e03e0&_nc_cat=100"
+  },
+  {
+    name: "Vijayamma.M.K",
+    role: "Union Council Member",
+    phone: "9446266822",
+    imageUrl: "https://media-maa3-2.cdn.whatsapp.net/v/t61.24694-24/509754062_1266924028420126_5921796743630118797_n.jpg?ccb=11-4&oh=01_Q5Aa3AEK9kXM9_Zbl9G6FZ-sIuehqN9GvL471opc6qfa_nYqkg&oe=69378E3F&_nc_sid=5e03e0&_nc_cat=108"
+  }
+];
+
+// Make data globally accessible (optional but safe)
+window.officeBearers = officeBearers;
+
+function showOfficeBearers() {
+  // Remove any existing popup
+  const existingPopup = document.getElementById("office-popup");
+  if (existingPopup) existingPopup.remove();
+
+  // Create overlay
+  const popup = document.createElement("div");
+  popup.id = "office-popup";
+  popup.className = "fixed inset-0 bg-black/60 flex items-center justify-center z-[9999] p-4 overflow-y-auto";
+  popup.setAttribute("role", "dialog");
+  popup.setAttribute("aria-modal", "true");
+  popup.setAttribute("aria-labelledby", "office-bearers-title");
+
+  // Close when clicking backdrop
+  popup.addEventListener("click", (e) => {
+    if (e.target === popup) popup.remove();
+  });
+
+  // Popup content box
+  const box = document.createElement("div");
+  box.className = "bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-screen overflow-y-auto p-6 relative animate-in fade-in zoom-in duration-200";
+
+  // Close button (accessible)
+  const closeBtn = document.createElement("button");
+  closeBtn.innerHTML = "&times;";
+  closeBtn.className = "absolute top-4 right-4 text-3xl text-gray-500 hover:text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-full w-10 h-10 hover:bg-gray-100 transition";
+  closeBtn.setAttribute("aria-label", "Close popup");
+  closeBtn.addEventListener("click", () => popup.remove());
+
+  // Prevent closing when clicking inside the box
+  box.addEventListener("click", (e) => e.stopPropagation());
+
+  // Title
+  const title = document.createElement("h2");
+  title.id = "office-bearers-title";
+  title.className = "text-2xl font-bold text-center mb-6 text-gray-800";
+  title.textContent = "Office Bearers 2025";
+
+  box.appendChild(closeBtn);
+  box.appendChild(title);
+
+  // Members list
+  const list = document.createElement("div");
+  list.className = "space-y-4";
+
+  officeBearers.forEach((member) => {
+    const card = document.createElement("div");
+    card.className = "flex items-center gap-4 p-4 bg-gray-50 rounded-xl border border-gray-200 hover:shadow-md transition-shadow";
+
+    // Safe image with fallback
+    const img = document.createElement("img");
+    img.src = member.imageUrl;
+    img.alt = `${member.name}'s photo`;
+    img.className = "w-16 h-16 rounded-full object-cover border-2 border-gray-300 shadow-sm";
+    img.loading = "lazy";
+    img.onerror = function() {
+      this.src = "https://via.placeholder.com/64?text=" + member.name.charAt(0);
+    };
+
+    const infoDiv = document.createElement("div");
+    infoDiv.className = "flex-1";
+
+    const nameSpan = document.createElement("div");
+    nameSpan.className = "font-semibold text-lg text-gray-900";
+    nameSpan.textContent = member.name;
+
+    const roleSpan = document.createElement("div");
+    roleSpan.className = "text-sm text-gray-600";
+    roleSpan.textContent = member.role;
+
+    const phoneLink = document.createElement("a");
+    phoneLink.href = `tel:${member.phone}`;
+    phoneLink.className = "inline-block mt-2 text-blue-600 font-medium hover:text-blue-800 underline";
+    phoneLink.textContent = `${member.phone.replace(/(\d{5})(\d{5})/, "$1 $2")}`;
+
+    // Optional: Add WhatsApp link
+    const waLink = document.createElement("a");
+    waLink.href = `https://wa.me/91${member.phone}`;
+    waLink.target = "_blank";
+    waLink.className = "ml-3 text-green-600 text-sm hover:underline";
+    waLink.textContent = "(WhatsApp)";
+    phoneLink.appendChild(waLink);
+
+    infoDiv.appendChild(nameSpan);
+    infoDiv.appendChild(roleSpan);
+    infoDiv.appendChild(phoneLink);
+
+    card.appendChild(img);
+    card.appendChild(infoDiv);
+    list.appendChild(card);
+  });
+
+  box.appendChild(list);
+  popup.appendChild(box);
+  document.body.appendChild(popup);
+
+  // Focus management for accessibility
+  closeBtn.focus();
+}
+
+// Optional: Close with Escape key
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") {
+    const popup = document.getElementById("office-popup");
+    if (popup) popup.remove();
+  }
+});
+
+
+
+
+
+
+function showMalayalamAnnouncement() {
+  // Prevent showing again today
+/*  const today = new Date().toDateString();
+  if (localStorage.getItem('announcement20251130') === today) return;
+  localStorage.setItem('announcement20251130', today);
+*/
+  // Create overlay
+  const overlay = document.createElement('div');
+  overlay.style.cssText = `
+    position:fixed; top:0; left:0; width:100%; height:100%;
+    background:rgba(0,0,0,0.6); z-index:9998; display:flex;
+    align-items:center; justify-content:center; padding:15px;
+    animation:fadeIn 0.5s ease-out;
+  `;
+
+  // Create popup
+  const popup = document.createElement('div');
+  popup.style.cssText = `
+    background:linear-gradient(135deg, #065f46, #0d8b4a);
+    color:white; padding:28px; border-radius:20px; max-width:420px; width:100%;
+    text-align:center; font-family:'Noto Sans Malayalam',sans-serif;
+    box-shadow:0 20px 50px rgba(0,0,0,0.5);
+    border:4px solid #fbbf24; position:relative;
+    animation:popupZoom 0.6s ease-out;
+  `;
+
+  // Close button
+  const closeBtn = document.createElement('button');
+  closeBtn.innerHTML = '✕';
+  closeBtn.style.cssText = `
+    position:absolute; top:8px; right:12px; background:rgba(255,255,255,0.2);
+    color:white; border:none; width:40px; height:40px; border-radius:50%;
+    font-size:26px; cursor:pointer; transition:0.3s;
+  `;
+  closeBtn.onmouseover = () => closeBtn.style.background = '#fbbf24';
+  closeBtn.onmouseout  = () => closeBtn.style.background = 'rgba(255,255,255,0.2)';
+  
+  closeBtn.onclick = () => document.body.removeChild(overlay);
+
+  // Message content
+  popup.innerHTML += `
+    <div style="font-size:1.4rem; font-weight:bold; color:#fbbf24; margin-bottom:12px;">
+      അറിയിപ്പ്
+    </div>
+    <div style="font-size:1.15rem; line-height:1.9;">
+      ഇരുന്നൂട്ടി മുല്ലക്കര എസ്എൻഡിപി ശാഖ മീറ്റിംഗ്<br>
+      <strong style="font-size:1.3rem; color:#fbbf24;">30/11/25 ശനി 4:30 PM</strong><br>
+      ശ്രീമതി സരമയുടെ വീട്ടിൽ വച്ചു നടത്തുവാൻ തീരുമാനിച്ചിരിക്കുന്നു.<br><br>
+      <strong style="color:#fff;">മുഴുവൻ കമ്മിറ്റി അംഗങ്ങളും കൃത്യസമയത്ത് എത്തിച്ചേരേണ്ടതാണ്.</strong>
+    </div>
+  `;
+
+  popup.appendChild(closeBtn);
+  overlay.appendChild(popup);
+  document.body.appendChild(overlay);
+
+  // Auto close after 5 seconds
+  setTimeout(() => {
+    if (overlay.parentNode) {
+      overlay.style.animation = 'fadeOut 0.6s ease-in forwards';
+      setTimeout(() => overlay.remove(), 600);
+    }
+  }, 8000);
+
+  // Click outside to close
+  overlay.onclick = (e) => {
+    if (e.target === overlay) overlay.remove();
+  };
+
+  // Add animations
+  const style = document.createElement('style');
+  style.textContent = `
+    @keyframes fadeIn { from {opacity:0;} to {opacity:1;} }
+    @keyframes fadeOut { to {opacity:0;} }
+    @keyframes popupZoom {
+      from {transform:scale(0.8); opacity:0;}
+      to {transform:scale(1); opacity:1;}
+    }
+  `;
+  document.head.appendChild(style);
+}
+
+// Run on page load
+window.addEventListener('load', showMalayalamAnnouncement);
+
+
+  </script>
+</body>
+</html>
