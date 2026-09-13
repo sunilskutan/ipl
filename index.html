@@ -1,112 +1,744 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Mobile QR Scanner</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Family Tree</title>
 
-  <!-- Firebase -->
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+<!-- Tailwind -->
+<script src="https://cdn.tailwindcss.com"></script>
 
-  <!-- QR Scanner -->
-  <script src="https://unpkg.com/html5-qrcode"></script>
+<!-- Fonts: Playfair Display (headings), Inter (body), Noto Sans Malayalam (Malayalam script) -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&family=Inter:wght@400;500;600;700&family=Noto+Sans+Malayalam:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-  <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      text-align: center;
-      background: #f2f2f2;
-    }
-    h3 {
-      margin-top: 1em;
-      color: #333;
-    }
-    #reader {
-      width: 90vw;
-      max-width: 400px;
-      margin: 1em auto;
-    }
-    @media print {
-      #reader {
-        display: none;
+<!-- Firebase (compat SDK, works with a plain <script> tag) -->
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js"></script>
+
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        colors: {
+          parchment: { DEFAULT: '#FAF6EE', dark: '#F1E9D8' },
+          ink: '#3A2E22',
+          teak: { DEFAULT: '#5C4630', light: '#8A6F4E' },
+          gold: { DEFAULT: '#B8863B', light: '#D8B876', dark: '#8C6526' },
+          leaf: { DEFAULT: '#3F5C4A', light: '#5C7D68' },
+          rose: { DEFAULT: '#9C4A56', light: '#C17984' },
+        },
+        fontFamily: {
+          display: ['"Playfair Display"', 'serif'],
+          body: ['Inter', 'sans-serif'],
+          ml: ['"Noto Sans Malayalam"', 'sans-serif'],
+        },
       }
     }
-  </style>
+  }
+</script>
+
+<style>
+  body { background-color: #FAF6EE; background-image: radial-gradient(#e6dcc4 0.7px, transparent 0.7px); background-size: 18px 18px; }
+  .lang-ml { font-family: 'Noto Sans Malayalam', sans-serif; }
+  .card-shadow { box-shadow: 0 1px 2px rgba(58,46,34,0.06), 0 4px 14px rgba(58,46,34,0.08); }
+  .scrollbar-thin::-webkit-scrollbar { height: 6px; width: 6px; }
+  .scrollbar-thin::-webkit-scrollbar-thumb { background: #D8B876; border-radius: 4px; }
+  @keyframes fadeIn { from { opacity:0; transform: translateY(4px);} to {opacity:1; transform:translateY(0);} }
+  .fade-in { animation: fadeIn .25s ease-out; }
+  .node-photo { object-fit: cover; }
+  .connector-v { width: 2px; background: #D8B876; }
+  .connector-h { height: 2px; background: #D8B876; }
+</style>
 </head>
-<body>
 
-  <h3>📷 Scan QR Code</h3>
-  <div id="reader"></div>
+<body class="min-h-screen font-body text-ink">
 
-  <script>
-   const firebaseConfig = {
-  apiKey: "AIzaSyBWmCyJepagKmTy5kfBCOdaGKmcOymj4zg",
-  authDomain: "sunivox.firebaseapp.com",
-  projectId: "sunivox",
-  storageBucket: "sunivox.firebasestorage.app",
-  messagingSenderId: "866107015527",
-  appId: "1:866107015527:web:2c0733694e797dd7586fc2",
-  measurementId: "G-06NVXJVKV2"
+<!-- ============ TOP BAR ============ -->
+<header class="sticky top-0 z-30 bg-parchment/95 backdrop-blur border-b border-gold-light/60">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between gap-3">
+    <div class="flex items-baseline gap-2 min-w-0">
+      <h1 class="font-display text-xl sm:text-2xl text-teak font-semibold whitespace-nowrap" data-i18n="appTitle">Family Tree</h1>
+      <span class="hidden sm:inline text-gold-dark/70 text-sm">·</span>
+    <!--  <span class="hidden sm:inline font-ml text-teak-light text-sm" data-i18n-force-ml="appTitle"></span> -->
+    </div>
+
+    <div class="flex items-center gap-2 sm:gap-3">
+      <!-- search -->
+      <div class="relative hidden md:block">
+        <input id="searchInput" type="text" placeholder="Search a name…" data-i18n-placeholder="search"
+          class="w-48 lg:w-64 text-sm rounded-full border border-gold-light bg-white/80 px-4 py-1.5 focus:outline-none focus:ring-2 focus:ring-gold/40" />
+        <div id="searchResults" class="hidden absolute mt-1 w-full bg-white rounded-xl card-shadow border border-gold-light/60 max-h-64 overflow-y-auto z-40"></div>
+      </div>
+
+      <button id="homeBtn" title="Reset view" class="p-2 rounded-full hover:bg-gold-light/30 text-teak" >
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 11.5 12 4l9 7.5"/><path d="M5 10v9a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1v-9"/></svg>
+      </button>
+
+      <button id="langToggle" class="text-sm font-medium px-3 py-1.5 rounded-full border border-gold-dark text-teak hover:bg-gold-light/30">EN / മല</button>
+
+      <button id="authBtn" class="text-sm font-medium px-3.5 py-1.5 rounded-full bg-teak text-parchment hover:bg-ink transition" data-i18n="login">Admin login</button>
+    </div>
+  </div>
+  <div class="md:hidden px-4 pb-3">
+    <div class="relative">
+      <input id="searchInputMobile" type="text" placeholder="Search a name…" data-i18n-placeholder="search"
+        class="w-full text-sm rounded-full border border-gold-light bg-white/80 px-4 py-1.5 focus:outline-none focus:ring-2 focus:ring-gold/40" />
+      <div id="searchResultsMobile" class="hidden absolute mt-1 w-full bg-white rounded-xl card-shadow border border-gold-light/60 max-h-64 overflow-y-auto z-40"></div>
+    </div>
+  </div>
+</header>
+
+<!-- breadcrumb / admin toolbar -->
+<div class="max-w-6xl mx-auto px-4 sm:px-6 mt-4 flex flex-wrap items-center justify-between gap-2">
+  <p class="text-sm text-teak-light">
+    <span data-i18n="viewing">Viewing subtree rooted at</span>:
+    <span id="rootLabel" class="font-semibold text-teak"></span>
+  </p>
+  <div id="adminToolbar" class="hidden flex-wrap gap-2"></div>
+</div>
+
+<!-- ============ TREE CONTAINER ============ -->
+<main class="max-w-6xl mx-auto px-2 sm:px-6 py-6">
+  <div id="treeContainer" class="overflow-x-auto scrollbar-thin pb-6"></div>
+</main>
+
+<footer class="max-w-6xl mx-auto px-6 py-8 text-center text-xs text-teak-light/70">
+  <span data-i18n="footer">Click a name to explore their branch · Double-click for full details</span>
+</footer>
+
+<!-- ============ MODALS ROOT ============ -->
+<div id="modalRoot"></div>
+
+<script>
+/* =========================================================================
+   1. CONFIGURATION — your Firebase project
+   ========================================================================= */
+const firebaseConfig = {
+  apiKey: "AIzaSyAJS_jtJCMv2hLLgcayVUiP-_SAm88I9r0",
+  authDomain: "bpis-328a2.firebaseapp.com",
+  projectId: "bpis-328a2",
+  storageBucket: "bpis-328a2.firebasestorage.app",
+  messagingSenderId: "145624331546",
+  appId: "1:145624331546:web:c57915c9675be6b24f28a3",
+  measurementId: "G-NPS40709BL"
 };
 
-    // Initialize Firebase
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
+/* =========================================================================
+   2. TRANSLATIONS (UI chrome only — person data is bilingual per-field)
+   ========================================================================= */
+const I18N = {
+  en: {
+    appTitle: "Family Tree", search: "Search a name…", login: "Admin login", logout: "Log out",
+    viewing: "Viewing subtree rooted at", footer: "Click a name to explore their branch · Double-click for full details",
+    close: "Close", edit: "Edit", delete: "Delete", save: "Save", cancel: "Cancel",
+    addSpouse: "Add spouse", addChild: "Add child", addParent: "Add parent",
+    fullName: "Name (English)", fullNameMl: "Name (Malayalam)", gender: "Gender", male: "Male", female: "Female",
+    dob: "Date of birth", dod: "Date of death (if applicable)", birthPlace: "Birth place",
+    occupation: "Occupation", notes: "Notes (English)", notesMl: "Notes (Malayalam)", photoUrl: "Photo URL",
+    parents: "Parents", spouses: "Spouse(s)", children: "Children",
+    loginTitle: "Admin login", email: "Email", password: "Password", signIn: "Sign in",
+    confirmDelete: "Delete this person? This cannot be undone.", yes: "Yes, delete", newPerson: "New person",
+    linkExisting: "Link an existing person", createNew: "Create a new person", none: "None recorded",
+    selectPerson: "Select person…", relationTo: "in relation to",
+    loggedInAs: "Signed in as admin", errorRequired: "Name (English) is required.",
+    addPerson: "Add family member", noResults: "No matches found",
+    emptyTitle: "No one has been added yet", emptyBody: "Sign in as admin to add the first family member.",
+  },
+  ml: {
+    appTitle: "കുടുംബം", search: "പേര് തിരയുക…", login: "അഡ്മിൻ ലോഗിൻ", logout: "ലോഗ് ഔട്ട്",
+    viewing: "കാണിക്കുന്നത്", footer: "ശാഖ കാണാൻ പേരിൽ ക്ലിക്ക് ചെയ്യുക · വിശദാംശങ്ങൾക്ക് ഡബിൾ ക്ലിക്ക് ചെയ്യുക",
+    close: "അടയ്ക്കുക", edit: "തിരുത്തുക", delete: "നീക്കം ചെയ്യുക", save: "സേവ് ചെയ്യുക", cancel: "റദ്ദാക്കുക",
+    addSpouse: "പങ്കാളിയെ ചേർക്കുക", addChild: "കുട്ടിയെ ചേർക്കുക", addParent: "മാതാപിതാവിനെ ചേർക്കുക",
+    fullName: "പേര് (ഇംഗ്ലീഷ്)", fullNameMl: "പേര് (മലയാളം)", gender: "ലിംഗം", male: "പുരുഷൻ", female: "സ്ത്രീ",
+    dob: "ജനന തീയതി", dod: "മരണ തീയതി (ഉണ്ടെങ്കിൽ)", birthPlace: "ജനന സ്ഥലം",
+    occupation: "തൊഴിൽ", notes: "കുറിപ്പുകൾ (ഇംഗ്ലീഷ്)", notesMl: "കുറിപ്പുകൾ (മലയാളം)", photoUrl: "ഫോട്ടോ URL",
+    parents: "മാതാപിതാക്കൾ", spouses: "പങ്കാളി/കൾ", children: "മക്കൾ",
+    loginTitle: "അഡ്മിൻ ലോഗിൻ", email: "ഇമെയിൽ", password: "പാസ്‌വേഡ്", signIn: "സൈൻ ഇൻ ചെയ്യുക",
+    confirmDelete: "ഈ വ്യക്തിയെ നീക്കം ചെയ്യണോ? ഇത് തിരികെ കിട്ടില്ല.", yes: "അതെ, നീക്കം ചെയ്യുക", newPerson: "പുതിയ വ്യക്തി",
+    linkExisting: "നിലവിലുള്ള വ്യക്തിയെ ബന്ധിപ്പിക്കുക", createNew: "പുതിയ വ്യക്തിയെ സൃഷ്ടിക്കുക", none: "രേഖപ്പെടുത്തിയിട്ടില്ല",
+    selectPerson: "വ്യക്തിയെ തിരഞ്ഞെടുക്കുക…", relationTo: "എന്നതുമായി ബന്ധപ്പെട്ട്",
+    loggedInAs: "അഡ്മിനായി സൈൻ ഇൻ ചെയ്തു", errorRequired: "പേര് (ഇംഗ്ലീഷ്) നിർബന്ധമാണ്.",
+    addPerson: "കുടുംബാംഗത്തെ ചേർക്കുക", noResults: "ഫലങ്ങളൊന്നും ഇല്ല",
+    emptyTitle: "ഇതുവരെ ആരെയും ചേർത്തിട്ടില്ല", emptyBody: "ആദ്യ അംഗത്തെ ചേർക്കാൻ അഡ്മിനായി സൈൻ ഇൻ ചെയ്യുക.",
+  }
+};
+let lang = localStorage.getItem('ft_lang') || 'en';
+function t(key){ return (I18N[lang] && I18N[lang][key]) || I18N.en[key] || key; }
 
-    const session = new URLSearchParams(location.search).get("session") || "defaultSession";
+/* =========================================================================
+   3. DATABASE — Cloud Firestore + Firebase Auth (Email/Password)
+   ========================================================================= */
+firebase.initializeApp(firebaseConfig);
+const fbAuth = firebase.auth();
+const fsDb = firebase.firestore();
 
-    // Preload beep audio
-    const beep = new Audio('https://actions.google.com/sounds/v1/alarms/beep_short.ogg');
-    beep.preload = 'auto';
+const DB = {
+  async getAll(){
+    const snap = await fsDb.collection('people').get();
+    const data = {};
+    snap.forEach(doc => data[doc.id] = doc.data());
+    return data;
+  },
+  async setPerson(id, person){ await fsDb.collection('people').doc(id).set(person); },
+  async deletePerson(id){ await fsDb.collection('people').doc(id).delete(); },
+  subscribe(cb){
+    return fsDb.collection('people').onSnapshot(snap => {
+      const data = {};
+      snap.forEach(doc => data[doc.id] = doc.data());
+      cb(data);
+    });
+  },
+  isAdmin(){ return !!fbAuth.currentUser; },
+  async login(email, password){ await fbAuth.signInWithEmailAndPassword(email, password); },
+  logout(){ fbAuth.signOut(); }
+};
 
-    // Create scanner
-    const html5QrCode = new Html5Qrcode("reader");
+/* =========================================================================
+   5. STATE
+   ========================================================================= */
+let people = {};       // { id: personObject }
+let rootId = null;      // currently focused node
+let isAdmin = false;
 
-    function startScanner() {
-      html5QrCode.start(
-        { facingMode: "environment" }, // rear camera
-        {
-          fps: 10,
-          qrbox: { width: 250, height: 250 }
-        },
-        onScanSuccess,
-        (errorMessage) => {
-          // Ignore scan errors
-        }
-      ).catch(err => {
-        alert("Camera start error: " + err);
-      });
+function genId(){ return 'p_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2,8); }
+
+// Pick a sensible default root: the person in the deepest (youngest / "lowest")
+// generation, so their ancestors are visible above them by default.
+function pickDefaultRoot(peopleMap){
+  const ids = Object.keys(peopleMap);
+  if (!ids.length) return null;
+  const depth = {};
+  function getDepth(id, visiting){
+    if (depth[id] !== undefined) return depth[id];
+    if (visiting.has(id)) return 0; // guard against accidental cycles
+    visiting.add(id);
+    const p = peopleMap[id];
+    const parentIds = (p && p.parents) || [];
+    let maxParentDepth = -1;
+    parentIds.forEach(pid => {
+      if (peopleMap[pid]) maxParentDepth = Math.max(maxParentDepth, getDepth(pid, visiting));
+    });
+    depth[id] = maxParentDepth + 1;
+    return depth[id];
+  }
+  ids.forEach(id => getDepth(id, new Set()));
+  let best = ids[0], bestDepth = -1;
+  ids.forEach(id => { if (depth[id] > bestDepth) { bestDepth = depth[id]; best = id; } });
+  return best;
+}
+
+function personName(p){ return lang === 'ml' && p.nameMl ? p.nameMl : (p.nameEn || '(unnamed)'); }
+function isMlName(p){ return lang === 'ml' && !!p.nameMl; }
+function avatarFor(p){
+  if (p.photoUrl) return p.photoUrl;
+  const seed = encodeURIComponent(p.nameEn || 'Person');
+  const bg = p.gender === 'F' ? 'C17984' : '5C7D68';
+  return `https://ui-avatars.com/api/?name=${seed}&background=${bg}&color=fff&size=128&font-size=0.36`;
+}
+
+/* =========================================================================
+   6. RENDERING
+   ========================================================================= */
+function nodeCard(id, opts={}){
+  const p = people[id];
+  if (!p) return '';
+  const borderColor = p.gender === 'F' ? 'border-rose-light' : 'border-leaf-light';
+  const ringColor = p.gender === 'F' ? 'ring-rose/30' : 'ring-leaf/30';
+  const isRoot = id === rootId ? 'ring-2 ring-gold shadow-lg scale-[1.03]' : '';
+  const birthYear = p.dob ? p.dob.slice(0,4) : '';
+  const deathYear = p.dod ? p.dod.slice(0,4) : '';
+  const years = birthYear ? (birthYear + (deathYear ? ' \u2013 ' + deathYear : '')) : '';
+  return `
+  <div class="node-card group cursor-pointer select-none flex flex-col items-center w-24 sm:w-28 shrink-0 ${isRoot} rounded-2xl transition-transform hover:-translate-y-0.5"
+       data-id="${id}" onclick="onNodeClick('${id}')" ondblclick="onNodeDblClick('${id}')">
+    <div class="relative">
+      <img src="${avatarFor(p)}" class="node-photo w-16 h-16 sm:w-20 sm:h-20 rounded-full border-2 ${borderColor} bg-white card-shadow ring-4 ${ringColor}" />
+    </div>
+    <div class="mt-1.5 text-center leading-tight">
+      <p class="text-xs sm:text-[13px] font-semibold text-ink ${isMlName(p)?'font-ml':''} truncate w-24 sm:w-28" title="${personName(p)}">${personName(p)}</p>
+      ${years ? `<p class="text-[10px] text-teak-light">${years}</p>` : ''}
+    </div>
+  </div>`;
+}
+
+function coupleRow(ids, opts={}){
+  // ids: array of person ids to show side by side connected by a small heart/line
+  return `<div class="flex items-center gap-1.5 sm:gap-2">
+    ${ids.map((id,i) => (i>0 ? `<span class="text-gold-dark text-sm px-0.5">&</span>` : '') + nodeCard(id, opts)).join('')}
+  </div>`;
+}
+
+function renderTree(){
+  const container = document.getElementById('treeContainer');
+  const root = people[rootId];
+  if (!root) {
+    document.getElementById('rootLabel').textContent = '—';
+    container.innerHTML = `
+      <div class="text-center py-16">
+        <p class="text-teak font-display text-lg mb-1">${t('emptyTitle')}</p>
+        <p class="text-teak-light text-sm">${t('emptyBody')}</p>
+      </div>`;
+    return;
+  }
+
+  document.getElementById('rootLabel').textContent = personName(root);
+  document.getElementById('rootLabel').className = 'font-semibold text-teak ' + (isMlName(root) ? 'font-ml' : '');
+
+  // ---- Ancestors (root's parents, each shown with their spouse(s)) ----
+  const parentIds = root.parents || [];
+  let ancestorsHtml = '';
+  if (parentIds.length) {
+    const groups = parentIds.map(pid => {
+      if (!people[pid]) return '';
+      return `<div class="flex flex-col items-center">${nodeCard(pid)}</div>`;
+    }).filter(Boolean);
+    ancestorsHtml = `
+    <div class="flex flex-col items-center mb-2">
+      <div class="flex items-start gap-4 sm:gap-8 justify-center flex-wrap">${groups.join('<span class="self-center text-gold-dark text-sm mt-6">&amp;</span>')}</div>
+      <div class="connector-v h-6"></div>
+    </div>`;
+  }
+
+  // ---- Root + spouses ----
+  const spouseIds = (root.spouses || []).filter(sid => people[sid]);
+  const coupleIds = [rootId, ...spouseIds];
+  const coupleHtml = `
+    <div class="flex flex-col items-center">
+      <div class="flex items-center gap-2 sm:gap-3 bg-white/70 border border-gold-light/70 rounded-2xl px-3 sm:px-5 py-3 card-shadow flex-wrap justify-center">
+        ${coupleIds.map((id,i) => (i>0 ? `<span class="text-gold-dark text-lg px-0.5">&#8901;</span>` : '') + nodeCard(id)).join('')}
+      </div>
+    </div>`;
+
+  // ---- Children ----
+  const childIds = root.children || [];
+  let descendantsHtml = '';
+  if (childIds.length) {
+    const items = childIds.map(cid => {
+      const child = people[cid];
+      if (!child) return '';
+      const childSpouses = (child.spouses || []).filter(sid => people[sid]);
+      const group = [cid, ...childSpouses];
+      return `<div class="flex flex-col items-center">
+        <div class="connector-v h-6"></div>
+        <div class="flex items-center gap-2 bg-parchment-dark/40 rounded-xl px-2 py-2">
+          ${group.map((id,i)=> (i>0 ? `<span class="text-gold-dark text-sm px-0.5">&#8901;</span>` : '') + nodeCard(id)).join('')}
+        </div>
+      </div>`;
+    }).filter(Boolean);
+    descendantsHtml = `
+    <div class="flex flex-col items-center mt-2">
+      <div class="connector-v h-6"></div>
+      <div class="flex items-start gap-3 sm:gap-6 justify-center flex-wrap max-w-full px-2">${items.join('')}</div>
+    </div>`;
+  }
+
+  container.innerHTML = `<div class="fade-in flex flex-col items-center py-4 min-w-max mx-auto">
+      ${ancestorsHtml}
+      ${coupleHtml}
+      ${descendantsHtml}
+    </div>`;
+}
+
+/* =========================================================================
+   7. NODE INTERACTIONS  (single click => re-root, double click => details)
+   ========================================================================= */
+let clickTimer = null;
+function onNodeClick(id){
+  if (clickTimer) { clearTimeout(clickTimer); clickTimer = null; return; } // part of a dblclick, ignore
+  clickTimer = setTimeout(() => { rootId = id; renderTree(); clickTimer = null; }, 220);
+}
+function onNodeDblClick(id){
+  if (clickTimer) { clearTimeout(clickTimer); clickTimer = null; }
+  openDetailModal(id);
+}
+
+/* =========================================================================
+   8. MODALS
+   ========================================================================= */
+function modalShell(innerHtml, opts={}){
+  const root = document.getElementById('modalRoot');
+  root.innerHTML = `
+  <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink/40 backdrop-blur-sm" id="modalBackdrop">
+    <div class="bg-parchment w-full ${opts.wide ? 'max-w-2xl' : 'max-w-md'} max-h-[90vh] overflow-y-auto rounded-2xl card-shadow border border-gold-light/60 fade-in">
+      ${innerHtml}
+    </div>
+  </div>`;
+  document.getElementById('modalBackdrop').addEventListener('click', (e) => {
+    if (e.target.id === 'modalBackdrop') closeModal();
+  });
+}
+function closeModal(){ document.getElementById('modalRoot').innerHTML = ''; }
+
+function relList(ids, opts={}){
+  if (!ids || !ids.length) return `<span class="text-teak-light/70 text-sm">${t('none')}</span>`;
+  return ids.filter(id=>people[id]).map(id => `<button onclick="closeModal(); rootId='${id}'; renderTree();" class="text-sm underline decoration-gold-dark decoration-1 underline-offset-2 text-teak hover:text-gold-dark ${isMlName(people[id])?'font-ml':''}">${personName(people[id])}</button>`).join(', ');
+}
+
+function openDetailModal(id){
+  const p = people[id];
+  if (!p) return;
+  const field = (label, val) => val ? `<div class="mb-2.5"><p class="text-[11px] uppercase tracking-wide text-teak-light/70">${label}</p><p class="text-sm text-ink ${''}">${val}</p></div>` : '';
+  modalShell(`
+    <div class="p-6 sm:p-7">
+      <div class="flex items-start justify-between gap-3 mb-4">
+        <div class="flex items-center gap-4">
+          <img src="${avatarFor(p)}" class="w-20 h-20 rounded-full border-2 ${p.gender==='F'?'border-rose-light':'border-leaf-light'} card-shadow" />
+          <div>
+            <h2 class="font-display text-xl text-teak font-semibold">${p.nameEn || '—'}</h2>
+            ${p.nameMl ? `<p class="font-ml text-teak-light text-base">${p.nameMl}</p>` : ''}
+          </div>
+        </div>
+        <button onclick="closeModal()" class="text-teak-light hover:text-ink text-xl leading-none px-1">&times;</button>
+      </div>
+
+      <div class="grid grid-cols-2 gap-x-4">
+        ${field(t('gender'), p.gender==='F' ? t('female') : t('male'))}
+        ${field(t('dob'), p.dob)}
+        ${field(t('dod'), p.dod)}
+        ${field(t('birthPlace'), p.birthPlace)}
+        ${field(t('occupation'), p.occupation)}
+      </div>
+      ${p.notesEn ? `<div class="mb-2.5"><p class="text-[11px] uppercase tracking-wide text-teak-light/70">${t('notes')}</p><p class="text-sm text-ink">${p.notesEn}</p></div>` : ''}
+      ${p.notesMl ? `<div class="mb-2.5"><p class="text-[11px] uppercase tracking-wide text-teak-light/70">${t('notesMl')}</p><p class="text-sm text-ink font-ml">${p.notesMl}</p></div>` : ''}
+
+      <hr class="border-gold-light/50 my-4">
+
+      <div class="space-y-2.5">
+        <div><span class="text-[11px] uppercase tracking-wide text-teak-light/70 mr-2">${t('parents')}</span>${relList(p.parents)}</div>
+        <div><span class="text-[11px] uppercase tracking-wide text-teak-light/70 mr-2">${t('spouses')}</span>${relList(p.spouses)}</div>
+        <div><span class="text-[11px] uppercase tracking-wide text-teak-light/70 mr-2">${t('children')}</span>${relList(p.children)}</div>
+      </div>
+
+      ${isAdmin ? `
+      <div class="mt-6 pt-4 border-t border-gold-light/50 flex flex-wrap gap-2">
+        <button onclick="openEditForm('${id}')" class="px-3 py-1.5 text-sm rounded-full border border-teak text-teak hover:bg-teak hover:text-parchment transition">${t('edit')}</button>
+        <button onclick="openAddRelativeForm('${id}','spouse')" class="px-3 py-1.5 text-sm rounded-full border border-leaf text-leaf hover:bg-leaf hover:text-parchment transition">${t('addSpouse')}</button>
+        <button onclick="openAddRelativeForm('${id}','child')" class="px-3 py-1.5 text-sm rounded-full border border-leaf text-leaf hover:bg-leaf hover:text-parchment transition">${t('addChild')}</button>
+        <button onclick="openAddRelativeForm('${id}','parent')" class="px-3 py-1.5 text-sm rounded-full border border-leaf text-leaf hover:bg-leaf hover:text-parchment transition">${t('addParent')}</button>
+        <button onclick="confirmDelete('${id}')" class="px-3 py-1.5 text-sm rounded-full border border-rose text-rose hover:bg-rose hover:text-parchment transition ml-auto">${t('delete')}</button>
+      </div>` : ''}
+    </div>
+  `);
+}
+
+function formField(labelKey, inputHtml){
+  return `<label class="block mb-3">
+    <span class="block text-xs font-medium text-teak-light mb-1">${t(labelKey)}</span>
+    ${inputHtml}
+  </label>`;
+}
+const inputCls = "w-full text-sm rounded-lg border border-gold-light bg-white px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gold/40";
+
+function openEditForm(id){
+  const p = people[id] || { nameEn:"", nameMl:"", gender:"M", photoUrl:"", dob:"", dod:"", birthPlace:"", occupation:"", notesEn:"", notesMl:"" };
+  modalShell(`
+    <form id="editForm" class="p-6 sm:p-7">
+      <h2 class="font-display text-lg text-teak font-semibold mb-4">${id ? t('edit') : t('newPerson')}</h2>
+      ${formField('fullName', `<input required name="nameEn" value="${p.nameEn||''}" class="${inputCls}">`)}
+      ${formField('fullNameMl', `<input name="nameMl" value="${p.nameMl||''}" class="${inputCls} font-ml">`)}
+      <label class="block mb-3">
+        <span class="block text-xs font-medium text-teak-light mb-1">${t('gender')}</span>
+        <select name="gender" class="${inputCls}">
+          <option value="M" ${p.gender==='M'?'selected':''}>${t('male')}</option>
+          <option value="F" ${p.gender==='F'?'selected':''}>${t('female')}</option>
+        </select>
+      </label>
+      ${formField('dob', `<input type="date" name="dob" value="${p.dob||''}" class="${inputCls}">`)}
+      ${formField('dod', `<input type="date" name="dod" value="${p.dod||''}" class="${inputCls}">`)}
+      ${formField('birthPlace', `<input name="birthPlace" value="${p.birthPlace||''}" class="${inputCls}">`)}
+      ${formField('occupation', `<input name="occupation" value="${p.occupation||''}" class="${inputCls}">`)}
+      ${formField('photoUrl', `<input name="photoUrl" value="${p.photoUrl||''}" placeholder="https://…" class="${inputCls}">`)}
+      ${formField('notes', `<textarea name="notesEn" rows="2" class="${inputCls}">${p.notesEn||''}</textarea>`)}
+      ${formField('notesMl', `<textarea name="notesMl" rows="2" class="${inputCls} font-ml">${p.notesMl||''}</textarea>`)}
+      <div class="flex justify-end gap-2 mt-5">
+        <button type="button" onclick="openDetailModal('${id}')" class="px-4 py-1.5 text-sm rounded-full border border-teak-light text-teak-light hover:bg-gold-light/20">${t('cancel')}</button>
+        <button type="submit" class="px-4 py-1.5 text-sm rounded-full bg-teak text-parchment hover:bg-ink">${t('save')}</button>
+      </div>
+    </form>
+  `);
+  document.getElementById('editForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const fd = new FormData(e.target);
+    const nameEn = fd.get('nameEn').trim();
+    if (!nameEn) { alert(t('errorRequired')); return; }
+    const updated = Object.assign({}, people[id], {
+      nameEn, nameMl: fd.get('nameMl').trim(), gender: fd.get('gender'),
+      dob: fd.get('dob'), dod: fd.get('dod'), birthPlace: fd.get('birthPlace').trim(),
+      occupation: fd.get('occupation').trim(), photoUrl: fd.get('photoUrl').trim(),
+      notesEn: fd.get('notesEn').trim(), notesMl: fd.get('notesMl').trim(),
+      parents: people[id]?.parents || [], spouses: people[id]?.spouses || [], children: people[id]?.children || [],
+    });
+    await DB.setPerson(id, updated);
+    people[id] = updated;
+    renderTree();
+    openDetailModal(id);
+  });
+}
+
+function openAddRelativeForm(anchorId, relation){
+  // relation: 'spouse' | 'child' | 'parent'
+  const anchor = people[anchorId];
+  const candidates = Object.keys(people).filter(pid => pid !== anchorId);
+  const relLabel = relation === 'spouse' ? t('addSpouse') : relation === 'child' ? t('addChild') : t('addParent');
+
+  modalShell(`
+    <div class="p-6 sm:p-7">
+      <h2 class="font-display text-lg text-teak font-semibold mb-1">${relLabel}</h2>
+      <p class="text-xs text-teak-light mb-4">${t('relationTo')}: <span class="${isMlName(anchor)?'font-ml':''}">${personName(anchor)}</span></p>
+
+      <div class="flex gap-2 mb-4 text-sm">
+        <button id="tabNew" class="flex-1 py-1.5 rounded-full bg-teak text-parchment">${t('createNew')}</button>
+        <button id="tabExisting" class="flex-1 py-1.5 rounded-full border border-teak text-teak">${t('linkExisting')}</button>
+      </div>
+
+      <div id="panelNew">
+        <form id="newRelForm">
+          ${formField('fullName', `<input required name="nameEn" class="${inputCls}">`)}
+          ${formField('fullNameMl', `<input name="nameMl" class="${inputCls} font-ml">`)}
+          <label class="block mb-3">
+            <span class="block text-xs font-medium text-teak-light mb-1">${t('gender')}</span>
+            <select name="gender" class="${inputCls}">
+              <option value="M">${t('male')}</option>
+              <option value="F">${t('female')}</option>
+            </select>
+          </label>
+          ${formField('dob', `<input type="date" name="dob" class="${inputCls}">`)}
+          ${formField('photoUrl', `<input name="photoUrl" placeholder="https://…" class="${inputCls}">`)}
+          <div class="flex justify-end gap-2 mt-5">
+            <button type="button" onclick="openDetailModal('${anchorId}')" class="px-4 py-1.5 text-sm rounded-full border border-teak-light text-teak-light hover:bg-gold-light/20">${t('cancel')}</button>
+            <button type="submit" class="px-4 py-1.5 text-sm rounded-full bg-teak text-parchment hover:bg-ink">${t('save')}</button>
+          </div>
+        </form>
+      </div>
+
+      <div id="panelExisting" class="hidden">
+        <label class="block mb-4">
+          <span class="block text-xs font-medium text-teak-light mb-1">${t('selectPerson')}</span>
+          <select id="existingSelect" class="${inputCls}">
+            <option value="">${t('selectPerson')}</option>
+            ${candidates.map(pid => `<option value="${pid}">${people[pid].nameEn}${people[pid].nameMl ? ' · '+people[pid].nameMl : ''}</option>`).join('')}
+          </select>
+        </label>
+        <div class="flex justify-end gap-2">
+          <button type="button" onclick="openDetailModal('${anchorId}')" class="px-4 py-1.5 text-sm rounded-full border border-teak-light text-teak-light hover:bg-gold-light/20">${t('cancel')}</button>
+          <button id="linkExistingBtn" class="px-4 py-1.5 text-sm rounded-full bg-teak text-parchment hover:bg-ink">${t('save')}</button>
+        </div>
+      </div>
+    </div>
+  `);
+
+  const tabNew = document.getElementById('tabNew');
+  const tabExisting = document.getElementById('tabExisting');
+  const panelNew = document.getElementById('panelNew');
+  const panelExisting = document.getElementById('panelExisting');
+  tabNew.onclick = () => { panelNew.classList.remove('hidden'); panelExisting.classList.add('hidden');
+    tabNew.className = 'flex-1 py-1.5 rounded-full bg-teak text-parchment'; tabExisting.className = 'flex-1 py-1.5 rounded-full border border-teak text-teak'; };
+  tabExisting.onclick = () => { panelExisting.classList.remove('hidden'); panelNew.classList.add('hidden');
+    tabExisting.className = 'flex-1 py-1.5 rounded-full bg-teak text-parchment'; tabNew.className = 'flex-1 py-1.5 rounded-full border border-teak text-teak'; };
+
+  document.getElementById('newRelForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const fd = new FormData(e.target);
+    const nameEn = fd.get('nameEn').trim();
+    if (!nameEn) { alert(t('errorRequired')); return; }
+    const newId = genId();
+    const newPerson = {
+      nameEn, nameMl: fd.get('nameMl').trim(), gender: fd.get('gender'),
+      photoUrl: fd.get('photoUrl').trim(), dob: fd.get('dob'), dod: '', birthPlace: '', occupation: '',
+      notesEn: '', notesMl: '', parents: [], spouses: [], children: []
+    };
+    await linkRelative(anchorId, newId, newPerson, relation);
+    closeModal(); renderTree(); openDetailModal(anchorId);
+  });
+
+  document.getElementById('linkExistingBtn').addEventListener('click', async () => {
+    const sel = document.getElementById('existingSelect').value;
+    if (!sel) return;
+    await linkRelative(anchorId, sel, people[sel], relation);
+    closeModal(); renderTree(); openDetailModal(anchorId);
+  });
+}
+
+async function linkRelative(anchorId, otherId, otherPersonData, relation){
+  const anchor = Object.assign({}, people[anchorId]);
+  const other = Object.assign({}, otherPersonData);
+  anchor.spouses = anchor.spouses || []; anchor.children = anchor.children || []; anchor.parents = anchor.parents || [];
+  other.spouses = other.spouses || []; other.children = other.children || []; other.parents = other.parents || [];
+
+  if (relation === 'spouse') {
+    if (!anchor.spouses.includes(otherId)) anchor.spouses.push(otherId);
+    if (!other.spouses.includes(anchorId)) other.spouses.push(anchorId);
+  } else if (relation === 'child') {
+    if (!anchor.children.includes(otherId)) anchor.children.push(otherId);
+    if (!other.parents.includes(anchorId)) other.parents.push(anchorId);
+  } else if (relation === 'parent') {
+    if (!anchor.parents.includes(otherId)) anchor.parents.push(otherId);
+    if (!other.children.includes(anchorId)) other.children.push(anchorId);
+  }
+
+  await DB.setPerson(anchorId, anchor);
+  await DB.setPerson(otherId, other);
+  people[anchorId] = anchor;
+  people[otherId] = other;
+}
+
+function confirmDelete(id){
+  modalShell(`
+    <div class="p-6 sm:p-7 text-center">
+      <p class="text-sm text-ink mb-5">${t('confirmDelete')}</p>
+      <div class="flex justify-center gap-2">
+        <button onclick="openDetailModal('${id}')" class="px-4 py-1.5 text-sm rounded-full border border-teak-light text-teak-light hover:bg-gold-light/20">${t('cancel')}</button>
+        <button onclick="doDelete('${id}')" class="px-4 py-1.5 text-sm rounded-full bg-rose text-parchment hover:bg-rose-light">${t('yes')}</button>
+      </div>
+    </div>
+  `);
+}
+async function doDelete(id){
+  // remove references from every other person
+  for (const pid of Object.keys(people)) {
+    if (pid === id) continue;
+    const p = people[pid];
+    let changed = false;
+    ['parents','spouses','children'].forEach(key => {
+      if (p[key] && p[key].includes(id)) { p[key] = p[key].filter(x => x !== id); changed = true; }
+    });
+    if (changed) await DB.setPerson(pid, p);
+  }
+  await DB.deletePerson(id);
+  delete people[id];
+  if (rootId === id) rootId = pickDefaultRoot(people);
+  closeModal();
+  renderTree();
+}
+
+/* =========================================================================
+   9. LOGIN MODAL
+   ========================================================================= */
+function openLoginModal(){
+  modalShell(`
+    <form id="loginForm" class="p-6 sm:p-7">
+      <h2 class="font-display text-lg text-teak font-semibold mb-4">${t('loginTitle')}</h2>
+      ${formField('email', `<input required type="email" name="email" class="${inputCls}">`)}
+      ${formField('password', `<input required type="password" name="password" class="${inputCls}">`)}
+      <p id="loginError" class="text-rose text-xs mb-2 hidden"></p>
+      <div class="flex justify-end gap-2 mt-3">
+        <button type="button" onclick="closeModal()" class="px-4 py-1.5 text-sm rounded-full border border-teak-light text-teak-light hover:bg-gold-light/20">${t('cancel')}</button>
+        <button type="submit" class="px-4 py-1.5 text-sm rounded-full bg-teak text-parchment hover:bg-ink">${t('signIn')}</button>
+      </div>
+    </form>
+  `);
+  document.getElementById('loginForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const fd = new FormData(e.target);
+    try {
+      await DB.login(fd.get('email'), fd.get('password'));
+      isAdmin = DB.isAdmin();
+      closeModal();
+      renderChrome();
+      renderTree();
+    } catch (err) {
+      const el = document.getElementById('loginError');
+      el.textContent = err.message || 'Login failed';
+      el.classList.remove('hidden');
     }
+  });
+}
 
-    function onScanSuccess(decodedText, decodedResult) {
-      // Pause scanning
-      html5QrCode.pause();
+/* =========================================================================
+   10. CHROME (top bar admin state, admin toolbar, language)
+   ========================================================================= */
+function applyI18nStatic(){
+  document.querySelectorAll('[data-i18n]').forEach(el => el.textContent = t(el.getAttribute('data-i18n')));
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(el => el.setAttribute('placeholder', t(el.getAttribute('data-i18n-placeholder'))));
+  const mlTitle = document.querySelector('[data-i18n-force-ml]');
+  if (mlTitle) mlTitle.textContent = I18N.ml.appTitle;
+  document.getElementById('langToggle').textContent = lang === 'en' ? 'EN / മല' : 'മല / EN';
+}
 
-      // Play beep immediately
-      beep.currentTime = 0;
-      beep.play();
+function renderChrome(){
+  applyI18nStatic();
+  const authBtn = document.getElementById('authBtn');
+  const toolbar = document.getElementById('adminToolbar');
+  if (isAdmin) {
+    authBtn.textContent = t('logout');
+    authBtn.onclick = () => { DB.logout(); isAdmin = false; renderChrome(); renderTree(); };
+    toolbar.classList.remove('hidden');
+    toolbar.innerHTML = `
+      <span class="text-xs text-leaf font-medium px-2 py-1 bg-leaf/10 rounded-full">${t('loggedInAs')}</span>
+      <button onclick="openEditForm(genId())" class="text-xs px-3 py-1.5 rounded-full border border-teak text-teak hover:bg-teak hover:text-parchment" id="addPersonBtn">${t('addPerson')}</button>
+    `;
+  } else {
+    authBtn.textContent = t('login');
+    authBtn.onclick = openLoginModal;
+    toolbar.classList.add('hidden');
+    toolbar.innerHTML = '';
+  }
+}
 
-      // Write to Firestore
-      db.collection("scans").doc(session).set({
-        value: decodedText,
-        timestamp: firebase.firestore.FieldValue.serverTimestamp()
-      }).then(() => {
-        console.log("✅ Data sent: " + decodedText);
-      }).catch((error) => {
-        alert("❌ Firestore Error: " + error);
-      }).finally(() => {
-        // Resume scanning after 1.5 seconds
-        setTimeout(() => {
-          html5QrCode.resume();
-        }, 1500);
-      });
-    }
+/* =========================================================================
+   11. SEARCH
+   ========================================================================= */
+function wireSearch(inputId, resultsId){
+  const input = document.getElementById(inputId);
+  const results = document.getElementById(resultsId);
+  input.addEventListener('input', () => {
+    const q = input.value.trim().toLowerCase();
+    if (!q) { results.classList.add('hidden'); results.innerHTML=''; return; }
+    const matches = Object.entries(people).filter(([id,p]) =>
+      (p.nameEn||'').toLowerCase().includes(q) || (p.nameMl||'').includes(q)
+    ).slice(0, 8);
+    results.innerHTML = matches.length
+      ? matches.map(([id,p]) => `<button class="w-full text-left px-3 py-2 text-sm hover:bg-gold-light/20 flex items-center gap-2" onclick="selectSearchResult('${id}','${inputId}','${resultsId}')">
+          <img src="${avatarFor(p)}" class="w-6 h-6 rounded-full">
+          <span>${p.nameEn}${p.nameMl ? ' · <span class=\"font-ml\">'+p.nameMl+'</span>' : ''}</span>
+        </button>`).join('')
+      : `<p class="px-3 py-2 text-sm text-teak-light">${t('noResults')}</p>`;
+    results.classList.remove('hidden');
+  });
+  document.addEventListener('click', (e) => {
+    if (!input.contains(e.target) && !results.contains(e.target)) results.classList.add('hidden');
+  });
+}
+function selectSearchResult(id, inputId, resultsId){
+  rootId = id;
+  renderTree();
+  document.getElementById(inputId).value = '';
+  document.getElementById(resultsId).classList.add('hidden');
+}
 
-    // Start the scanner when page loads
-    startScanner();
-  </script>
+/* =========================================================================
+   12. INIT
+   ========================================================================= */
+document.getElementById('langToggle').addEventListener('click', () => {
+  lang = lang === 'en' ? 'ml' : 'en';
+  localStorage.setItem('ft_lang', lang);
+  renderChrome();
+  renderTree();
+});
+document.getElementById('homeBtn').addEventListener('click', () => {
+  rootId = pickDefaultRoot(people);
+  renderTree();
+});
+wireSearch('searchInput', 'searchResults');
+wireSearch('searchInputMobile', 'searchResultsMobile');
 
+async function init(){
+  renderChrome();
+  people = await DB.getAll();
+  rootId = pickDefaultRoot(people);
+  renderTree();
+
+  DB.subscribe(data => {
+    people = data;
+    if (!people[rootId]) rootId = pickDefaultRoot(people);
+    renderTree();
+  });
+
+  fbAuth.onAuthStateChanged(user => { isAdmin = !!user; renderChrome(); renderTree(); });
+}
+init();
+</script>
 </body>
 </html>
