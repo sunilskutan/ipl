@@ -71,6 +71,7 @@
 <header class="sticky top-0 z-30 bg-parchment/95 backdrop-blur border-b border-gold-light/60">
   <div class="max-w-6xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between gap-3">
     <div class="flex items-baseline gap-2 min-w-0">
+     <span id="hear">🔊 </span> <audio id="audio"> <source src="eng.mp3" type="audio/mpeg"> </audio>
       <h1 class="font-display text-xl sm:text-2xl text-teak font-semibold whitespace-nowrap" data-i18n="appTitle">Family Tree</h1>
       <span class="hidden sm:inline text-gold-dark/70 text-sm">·</span>
     <!--  <span class="hidden sm:inline font-ml text-teak-light text-sm" data-i18n-force-ml="appTitle"></span> -->
@@ -751,6 +752,42 @@ async function init(){
   fbAuth.onAuthStateChanged(user => { isAdmin = !!user; renderChrome(); renderTree(); });
 }
 init();
+
+ const hear = document.getElementById("hear");
+const audio = document.getElementById("audio");
+
+let isEnglish = true;
+
+hear.addEventListener("click", function () {
+
+    if (audio.paused) {
+
+        // Select the audio file
+        audio.src = isEnglish ? "eng.mp3" : "mal.mp3";
+
+        audio.play();
+
+        // Change for next click
+        isEnglish = !isEnglish;
+
+    } else {
+        audio.pause();
+    }
+});
+
+audio.addEventListener("play", function () {
+    hear.textContent = "🔉";
+});
+
+audio.addEventListener("pause", function () {
+    hear.textContent = "🔊";
+});
+
+audio.addEventListener("ended", function () {
+    hear.textContent = "🔊";
+});
+
+ 
 </script>
 </body>
 </html>
