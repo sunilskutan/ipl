@@ -818,9 +818,100 @@ audio.addEventListener("ended", function () {
     hear.classList.remove("opacity-50");
     hear.classList.add("opacity-100");
 });
+</script>
 
+    <!-- Intro Audio -->
+<audio id="introAudio"
+       src="intro.mp3"
+       preload="auto"
+       playsinline
+       webkit-playsinline></audio>
 
+<!-- Cancel Button (hidden by default) -->
+<button id="cancelIntroBtn"
+        type="button"
+        class="fixed bottom-5 right-5 z-[9999]
+               px-4 py-2 rounded-lg
+               bg-white/90 shadow-lg text-xl
+               hover:bg-gray-100 active:scale-95
+               transition duration-200
+               hidden">          <!-- ← hidden until audio starts -->
+    🔇
+</button>
 
+<script>
+(function () {
+    const audio = document.getElementById("introAudio");
+    const cancelBtn = document.getElementById("cancelIntroBtn");
+
+    const START_DELAY = 0;   // change if you want delay before audio starts
+
+    let started = false;
+    let cancelled = false;
+    let startTimer = null;
+
+    // -----------------------------------------
+    // FIRST USER TOUCH
+    // -----------------------------------------
+    function onFirstInteraction(e) {
+        // Ignore the cancel button itself
+        if (e.target === cancelBtn || cancelBtn.contains(e.target)) return;
+        if (started || cancelled) return;
+
+        started = true;
+        document.removeEventListener("pointerdown", onFirstInteraction);
+
+        startTimer = setTimeout(() => {
+            if (cancelled) return;
+
+            audio.muted = false;
+            audio.currentTime = 0;
+
+            const playPromise = audio.play();
+
+            if (playPromise !== undefined) {
+                playPromise
+                    .then(() => {
+                        // Show the mute button only after audio successfully starts
+                        cancelBtn.classList.remove("hidden");
+                    })
+                    .catch(err => {
+                        console.warn("Intro audio failed:", err);
+                        cancelBtn.classList.add("hidden");
+                    });
+            }
+        }, START_DELAY);
+    }
+
+    document.addEventListener("pointerdown", onFirstInteraction, { passive: true });
+
+    // -----------------------------------------
+    // AUDIO FINISHED
+    // -----------------------------------------
+    audio.addEventListener("ended", () => {
+        cancelBtn.classList.add("hidden");
+    });
+
+    // -----------------------------------------
+    // CANCEL BUTTON
+    // -----------------------------------------
+    function cancelIntroAudio() {
+        cancelled = true;
+
+        if (startTimer) {
+            clearTimeout(startTimer);
+            startTimer = null;
+        }
+
+        audio.pause();
+        audio.currentTime = 0;
+        cancelBtn.classList.add("hidden");
+    }
+
+    cancelBtn.addEventListener("click", cancelIntroAudio);
+    window.cancelIntroAudio = cancelIntroAudio;
+
+})();
 </script>
 </body>
 </html>
