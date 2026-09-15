@@ -1,124 +1,153 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
- <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta property="og:title" content="Family Tree">
     <meta property="og:description" content="for generations">
-    <meta property="og:image" content="https://png.pngtree.com/png-clipart/20240812/original/pngtree-vibrant-family-tree-png-image_15761660.png">
-    <meta property="og:url" content="https://sunilskutan.github.io/ipl/">
+    <meta property="og:image" content="https://images6.alphacoders.com/137/thumb-1920-1377828.png">
+    <meta property="og:url" content="https://sunilskutan.github.io/ipl/familyLocal/">
     <meta property="og:type" content="website">
 
     <!-- Twitter Card for better preview on Twitter -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Family Tree">
     <meta name="twitter:description" content="for generations">
-    <meta name="twitter:image" content="https://png.pngtree.com/png-clipart/20240812/original/pngtree-vibrant-family-tree-png-image_15761660.png">
+    <meta name="twitter:image" content="https://images6.alphacoders.com/137/thumb-1920-1377828.png">
 
-<title>Family Tree</title>
+<title>Family Tree · കുടുംബ വൃക്ഷം</title>
 
 <!-- Tailwind -->
 <script src="https://cdn.tailwindcss.com"></script>
 
 <!-- Fonts: Playfair Display (headings), Inter (body), Noto Sans Malayalam (Malayalam script) -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&family=Inter:wght@400;500;600;700&family=Noto+Sans+Malayalam:wght@400;500;600;700&display=swap" rel="stylesheet">
-
-<!-- Firebase (compat SDK, works with a plain <script> tag) -->
-<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Cormorant+Garamond:wght@500;600&family=Inter:wght@400;500;600;700&family=Noto+Sans+Malayalam:wght@400;500;600;700&display=swap" rel="stylesheet">
 
 <script>
   tailwind.config = {
     theme: {
       extend: {
         colors: {
-          parchment: { DEFAULT: '#FAF6EE', dark: '#F1E9D8' },
-          ink: '#3A2E22',
-          teak: { DEFAULT: '#5C4630', light: '#8A6F4E' },
-          gold: { DEFAULT: '#B8863B', light: '#D8B876', dark: '#8C6526' },
-          leaf: { DEFAULT: '#3F5C4A', light: '#5C7D68' },
-          rose: { DEFAULT: '#9C4A56', light: '#C17984' },
+          parchment: { DEFAULT: '#FBF7EE', dark: '#F0E6CE' },
+          ink: '#382C1F',
+          teak: { DEFAULT: '#5B4630', light: '#8C7150', dark: '#3E301F' },
+          gold: { DEFAULT: '#B8863B', light: '#E4C989', dark: '#8A6425', soft: '#F3E3BE' },
+          leaf: { DEFAULT: '#3E5C48', light: '#6C8F76', soft: '#DCE9DF' },
+          rose: { DEFAULT: '#A34C58', light: '#CD8790', soft: '#F3DEE0' },
         },
         fontFamily: {
           display: ['"Playfair Display"', 'serif'],
+          serifAccent: ['"Cormorant Garamond"', 'serif'],
           body: ['Inter', 'sans-serif'],
           ml: ['"Noto Sans Malayalam"', 'sans-serif'],
         },
+        boxShadow: {
+          card: '0 1px 2px rgba(56,44,31,0.07), 0 8px 20px -6px rgba(56,44,31,0.16)',
+          cardHover: '0 2px 6px rgba(56,44,31,0.10), 0 16px 32px -8px rgba(56,44,31,0.24)',
+        }
       }
     }
   }
 </script>
 
 <style>
-  body { background-color: #FAF6EE; background-image: radial-gradient(#e6dcc4 0.7px, transparent 0.7px); background-size: 18px 18px; }
+  body {
+    background-color: #FBF7EE;
+    background-image:
+      radial-gradient(circle at 1px 1px, rgba(184,134,59,0.16) 1px, transparent 0);
+    background-size: 22px 22px;
+  }
   .lang-ml { font-family: 'Noto Sans Malayalam', sans-serif; }
-  .card-shadow { box-shadow: 0 1px 2px rgba(58,46,34,0.06), 0 4px 14px rgba(58,46,34,0.08); }
-  .scrollbar-thin::-webkit-scrollbar { height: 6px; width: 6px; }
-  .scrollbar-thin::-webkit-scrollbar-thumb { background: #D8B876; border-radius: 4px; }
-  @keyframes fadeIn { from { opacity:0; transform: translateY(4px);} to {opacity:1; transform:translateY(0);} }
-  .fade-in { animation: fadeIn .25s ease-out; }
+  .scrollbar-thin::-webkit-scrollbar { height: 8px; width: 8px; }
+  .scrollbar-thin::-webkit-scrollbar-thumb { background: #E4C989; border-radius: 999px; }
+  .scrollbar-thin::-webkit-scrollbar-track { background: transparent; }
+  @keyframes fadeIn { from { opacity:0; transform: translateY(6px);} to {opacity:1; transform:translateY(0);} }
+  @keyframes popIn { from { opacity:0; transform: scale(.96) translateY(6px);} to {opacity:1; transform:scale(1) translateY(0);} }
+  .fade-in { animation: fadeIn .3s cubic-bezier(.2,.7,.3,1); }
+  .pop-in { animation: popIn .22s cubic-bezier(.2,.7,.3,1); }
   .node-photo { object-fit: cover; }
-  .connector-v { width: 2px; background: #D8B876; }
-  .connector-h { height: 2px; background: #D8B876; }
+  .connector-v { width: 2px; background: linear-gradient(#E4C989, #B8863B); }
+  .ornament-divider { height: 1px; background: linear-gradient(90deg, transparent, #B8863B, transparent); }
+  .couple-band { background: linear-gradient(180deg, rgba(255,255,255,0.9), rgba(255,255,255,0.55)); }
+  .generation-chip { letter-spacing: .08em; }
 </style>
 </head>
 
 <body class="min-h-screen font-body text-ink">
 
 <!-- ============ TOP BAR ============ -->
-<header class="sticky top-0 z-30 bg-parchment/95 backdrop-blur border-b border-gold-light/60">
-  <div class="max-w-6xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between gap-3">
-    <div class="flex items-baseline gap-2 min-w-0">
-     <span id="hear">🔊 </span> <audio id="audio"> <source src="eng.mp3" type="audio/mpeg"> </audio>
-      <h1 class="font-display text-xl sm:text-2xl text-teak font-semibold whitespace-nowrap" data-i18n="appTitle">Family Tree</h1>
-      <span class="hidden sm:inline text-gold-dark/70 text-sm">·</span>
-    <!--  <span class="hidden sm:inline font-ml text-teak-light text-sm" data-i18n-force-ml="appTitle"></span> -->
+<header class="sticky top-0 z-30 bg-parchment/90 backdrop-blur-md border-b border-gold-light/70">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 py-3.5 flex items-center justify-between gap-3">
+    <div class="flex items-center gap-2.5 min-w-0">
+      <span id="hear"><svg class="w-7 h-7 sm:w-8 sm:h-8 text-gold-dark shrink-0 font-bold animate-[pulse_2.5s_ease-in-out_infinite]" viewBox="0 0 48 48" fill="none">
+  <path d="M24 5c-3 4-3 8 0 11s3 7 0 11"
+        stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+
+  <path d="M24 16c-6 1-9 5-9 10M24 16c6 1 9 5 9 10M24 27c-4 1-6 4-6 8M24 27c4 1 6 4 6 8"
+        stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+
+  <circle cx="24" cy="6" r="2.4" fill="currentColor"/>
+  <circle cx="15" cy="27" r="2" fill="currentColor"/>
+  <circle cx="33" cy="27" r="2" fill="currentColor"/>
+  <circle cx="18" cy="36" r="2" fill="currentColor"/>
+  <circle cx="30" cy="36" r="2" fill="currentColor"/>
+</svg></span> <audio id="audio"> <source src="eng.mp3" type="audio/mpeg"> </audio>
+      <div class="min-w-0">
+        <h1 class="font-display text-lg sm:text-2xl text-teak font-semibold leading-tight whitespace-nowrap" data-i18n="appTitle">Family Tree</h1>
+        <p class="hidden sm:block font-ml text-teak-light text-xs leading-tight" >x</p>
+      </div>
     </div>
 
     <div class="flex items-center gap-2 sm:gap-3">
-      <!-- search -->
       <div class="relative hidden md:block">
+        <svg class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gold-dark/70" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
         <input id="searchInput" type="text" placeholder="Search a name…" data-i18n-placeholder="search"
-          class="w-48 lg:w-64 text-sm rounded-full border border-gold-light bg-white/80 px-4 py-1.5 focus:outline-none focus:ring-2 focus:ring-gold/40" />
-        <div id="searchResults" class="hidden absolute mt-1 w-full bg-white rounded-xl card-shadow border border-gold-light/60 max-h-64 overflow-y-auto z-40"></div>
+          class="w-48 lg:w-64 text-sm rounded-full border border-gold-light bg-white/80 pl-9 pr-4 py-1.5 focus:outline-none focus:ring-2 focus:ring-gold/40" />
+        <div id="searchResults" class="hidden absolute mt-1 w-full bg-white rounded-xl shadow-card border border-gold-light/60 max-h-64 overflow-y-auto z-40"></div>
       </div>
 
-      <button id="homeBtn" title="Reset view" class="p-2 rounded-full hover:bg-gold-light/30 text-teak" >
+      <button id="homeBtn" title="Reset view" class="p-2 rounded-full hover:bg-gold-soft text-teak transition-colors">
         <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 11.5 12 4l9 7.5"/><path d="M5 10v9a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1v-9"/></svg>
       </button>
 
-      <button id="langToggle" class="text-sm font-medium px-3 py-1.5 rounded-full border border-gold-dark text-teak hover:bg-gold-light/30">EN / മല</button>
+      <button id="langToggle" class="text-sm font-medium px-3 py-1.5 rounded-full border border-gold-dark text-teak hover:bg-gold-soft transition-colors">EN / മല</button>
 
-      <button id="authBtn" class="text-sm font-medium px-3.5 py-1.5 rounded-full bg-teak text-parchment hover:bg-ink transition" data-i18n="login">Admin login</button>
+      <button id="addPersonBtn" onclick="openEditForm(genId())" class="hidden sm:flex items-center gap-1.5 text-sm font-medium px-3.5 py-1.5 rounded-full bg-teak text-parchment hover:bg-ink transition-colors">
+        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+        <span data-i18n="addPerson">Add family member</span>
+      </button>
+      <button id="addPersonBtnMobile" onclick="openEditForm(genId())" class="sm:hidden p-2 rounded-full bg-teak text-parchment">
+        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+      </button>
     </div>
   </div>
   <div class="md:hidden px-4 pb-3">
     <div class="relative">
       <input id="searchInputMobile" type="text" placeholder="Search a name…" data-i18n-placeholder="search"
         class="w-full text-sm rounded-full border border-gold-light bg-white/80 px-4 py-1.5 focus:outline-none focus:ring-2 focus:ring-gold/40" />
-      <div id="searchResultsMobile" class="hidden absolute mt-1 w-full bg-white rounded-xl card-shadow border border-gold-light/60 max-h-64 overflow-y-auto z-40"></div>
+      <div id="searchResultsMobile" class="hidden absolute mt-1 w-full bg-white rounded-xl shadow-card border border-gold-light/60 max-h-64 overflow-y-auto z-40"></div>
     </div>
   </div>
 </header>
 
-<!-- breadcrumb / admin toolbar -->
-<div class="max-w-6xl mx-auto px-4 sm:px-6 mt-4 flex flex-wrap items-center justify-between gap-2">
+<!-- breadcrumb / toolbar -->
+<div class="max-w-6xl mx-auto px-4 sm:px-6 mt-5 flex flex-wrap items-center justify-between gap-3">
   <p class="text-sm text-teak-light">
-    <span data-i18n="viewing">Viewing subtree rooted at</span>:
-    <span id="rootLabel" class="font-semibold text-teak"></span>
+    <span data-i18n="viewing">Viewing subtree rooted at</span>
+    <span id="rootLabel" class="font-semibold text-teak font-display text-base ml-1"></span>
   </p>
-  <div id="adminToolbar" class="hidden flex-wrap gap-2"></div>
+  <button onclick="resetDemoData()" class="text-xs px-3 py-1.5 rounded-full border border-gold-dark/60 text-gold-dark hover:bg-gold-soft transition-colors" data-i18n="seedData">Reset demo data</button>
 </div>
 
 <!-- ============ TREE CONTAINER ============ -->
-<main class="max-w-6xl mx-auto px-2 sm:px-6 py-6">
+<main class="max-w-6xl mx-auto px-2 sm:px-6 py-8">
   <div id="treeContainer" class="overflow-x-auto scrollbar-thin pb-6"></div>
 </main>
 
-<footer class="max-w-6xl mx-auto px-6 py-8 text-center text-xs text-teak-light/70">
-  <span data-i18n="footer">Click a name to explore their branch · Double-click for full details</span>
+<footer class="max-w-6xl mx-auto px-6 pb-10">
+  <div class="ornament-divider mb-4"></div>
+  <p class="text-center text-xs text-teak-light/80 font-serifAccent italic text-sm" data-i18n="footer">Click a name to explore their branch · Double-click for full details</p>
 </footer>
 
 <!-- ============ MODALS ROOT ============ -->
@@ -126,24 +155,11 @@
 
 <script>
 /* =========================================================================
-   1. CONFIGURATION — your Firebase project
-   ========================================================================= */
-const firebaseConfig = {
-  apiKey: "AIzaSyAJS_jtJCMv2hLLgcayVUiP-_SAm88I9r0",
-  authDomain: "bpis-328a2.firebaseapp.com",
-  projectId: "bpis-328a2",
-  storageBucket: "bpis-328a2.firebasestorage.app",
-  messagingSenderId: "145624331546",
-  appId: "1:145624331546:web:c57915c9675be6b24f28a3",
-  measurementId: "G-NPS40709BL"
-};
-
-/* =========================================================================
-   2. TRANSLATIONS (UI chrome only — person data is bilingual per-field)
+   1. TRANSLATIONS (UI chrome only — person data is bilingual per-field)
    ========================================================================= */
 const I18N = {
   en: {
-    appTitle: "Family Tree", search: "Search a name…", login: "Admin login", logout: "Log out",
+    appTitle: "Family Tree", search: "Search a name…",
     viewing: "Viewing subtree rooted at", footer: "Click a name to explore their branch · Double-click for full details",
     close: "Close", edit: "Edit", delete: "Delete", save: "Save", cancel: "Cancel",
     addSpouse: "Add spouse", addChild: "Add child", addParent: "Add parent",
@@ -151,16 +167,15 @@ const I18N = {
     dob: "Date of birth", dod: "Date of death (if applicable)", birthPlace: "Birth place",
     occupation: "Occupation", notes: "Notes (English)", notesMl: "Notes (Malayalam)", photoUrl: "Photo URL",
     parents: "Parents", spouses: "Spouse(s)", children: "Children",
-    loginTitle: "Admin login", email: "Email", password: "Password", signIn: "Sign in",
     confirmDelete: "Delete this person? This cannot be undone.", yes: "Yes, delete", newPerson: "New person",
     linkExisting: "Link an existing person", createNew: "Create a new person", none: "None recorded",
-    selectPerson: "Select person…", relationTo: "in relation to",
-    loggedInAs: "Signed in as admin", errorRequired: "Name (English) is required.",
+    selectPerson: "Select person…", relationTo: "in relation to", seedData: "Reset demo data",
+    errorRequired: "Name (English) is required.",
     addPerson: "Add family member", noResults: "No matches found",
-    emptyTitle: "No one has been added yet", emptyBody: "Sign in as admin to add the first family member.",
+    emptyTitle: "No one has been added yet", emptyBody: "Use \u201cAdd family member\u201d to create the first person.",
   },
   ml: {
-    appTitle: "കുടുംബം", search: "പേര് തിരയുക…", login: "അഡ്മിൻ ലോഗിൻ", logout: "ലോഗ് ഔട്ട്",
+    appTitle: "കുടുംബ ശ്രേണി", search: "പേര് തിരയുക…",
     viewing: "കാണിക്കുന്നത്", footer: "ശാഖ കാണാൻ പേരിൽ ക്ലിക്ക് ചെയ്യുക · വിശദാംശങ്ങൾക്ക് ഡബിൾ ക്ലിക്ക് ചെയ്യുക",
     close: "അടയ്ക്കുക", edit: "തിരുത്തുക", delete: "നീക്കം ചെയ്യുക", save: "സേവ് ചെയ്യുക", cancel: "റദ്ദാക്കുക",
     addSpouse: "പങ്കാളിയെ ചേർക്കുക", addChild: "കുട്ടിയെ ചേർക്കുക", addParent: "മാതാപിതാവിനെ ചേർക്കുക",
@@ -168,64 +183,135 @@ const I18N = {
     dob: "ജനന തീയതി", dod: "മരണ തീയതി (ഉണ്ടെങ്കിൽ)", birthPlace: "ജനന സ്ഥലം",
     occupation: "തൊഴിൽ", notes: "കുറിപ്പുകൾ (ഇംഗ്ലീഷ്)", notesMl: "കുറിപ്പുകൾ (മലയാളം)", photoUrl: "ഫോട്ടോ URL",
     parents: "മാതാപിതാക്കൾ", spouses: "പങ്കാളി/കൾ", children: "മക്കൾ",
-    loginTitle: "അഡ്മിൻ ലോഗിൻ", email: "ഇമെയിൽ", password: "പാസ്‌വേഡ്", signIn: "സൈൻ ഇൻ ചെയ്യുക",
     confirmDelete: "ഈ വ്യക്തിയെ നീക്കം ചെയ്യണോ? ഇത് തിരികെ കിട്ടില്ല.", yes: "അതെ, നീക്കം ചെയ്യുക", newPerson: "പുതിയ വ്യക്തി",
     linkExisting: "നിലവിലുള്ള വ്യക്തിയെ ബന്ധിപ്പിക്കുക", createNew: "പുതിയ വ്യക്തിയെ സൃഷ്ടിക്കുക", none: "രേഖപ്പെടുത്തിയിട്ടില്ല",
-    selectPerson: "വ്യക്തിയെ തിരഞ്ഞെടുക്കുക…", relationTo: "എന്നതുമായി ബന്ധപ്പെട്ട്",
-    loggedInAs: "അഡ്മിനായി സൈൻ ഇൻ ചെയ്തു", errorRequired: "പേര് (ഇംഗ്ലീഷ്) നിർബന്ധമാണ്.",
+    selectPerson: "വ്യക്തിയെ തിരഞ്ഞെടുക്കുക…", relationTo: "എന്നതുമായി ബന്ധപ്പെട്ട്", seedData: "ഡെമോ ഡാറ്റ പുനഃസജ്ജമാക്കുക",
+    errorRequired: "പേര് (ഇംഗ്ലീഷ്) നിർബന്ധമാണ്.",
     addPerson: "കുടുംബാംഗത്തെ ചേർക്കുക", noResults: "ഫലങ്ങളൊന്നും ഇല്ല",
-    emptyTitle: "ഇതുവരെ ആരെയും ചേർത്തിട്ടില്ല", emptyBody: "ആദ്യ അംഗത്തെ ചേർക്കാൻ അഡ്മിനായി സൈൻ ഇൻ ചെയ്യുക.",
+    emptyTitle: "ഇതുവരെ ആരെയും ചേർത്തിട്ടില്ല", emptyBody: "ആദ്യ അംഗത്തെ ചേർക്കാൻ \u201cകുടുംബാംഗത്തെ ചേർക്കുക\u201d ഉപയോഗിക്കുക.",
   }
 };
 let lang = localStorage.getItem('ft_lang') || 'en';
 function t(key){ return (I18N[lang] && I18N[lang][key]) || I18N.en[key] || key; }
 
 /* =========================================================================
-   3. DATABASE — Cloud Firestore + Firebase Auth (Email/Password)
+   2. DUMMY / SEED DATA — four generations, each person has a photo,
+      including an ancestor with two wives to demonstrate multi-spouse support
    ========================================================================= */
-firebase.initializeApp(firebaseConfig);
-const fbAuth = firebase.auth();
-const fsDb = firebase.firestore();
+function seedDummyData(){
+  const d = {};
+  const P = (id, obj) => d[id] = Object.assign({
+    nameEn:"", nameMl:"", gender:"M", photoUrl:"", dob:"", dod:"", birthPlace:"",
+    occupation:"", notesEn:"", notesMl:"", parents:[], spouses:[], children:[]
+  }, obj);
+  const M = n => `https://xsgames.co/randomusers/assets/avatars/male/${n}.jpg`;
+  const F = n => `https://xsgames.co/randomusers/assets/avatars/female/${n}.jpg`;
 
+  // ---- Generation 1 ----
+  P('p1', { nameEn:"Krishnan Nair", nameMl:"കൃഷ്ണൻ നായർ", gender:"M", photoUrl:M(58), dob:"1928-02-14", dod:"2004-07-19",
+    birthPlace:"Palakkad, Kerala", occupation:"Farmer & village elder", spouses:["p2","p3"], children:["p4","p5","p6"],
+    notesEn:"Patriarch of the family; remembered for planting the first coconut grove in the village.",
+    notesMl:"കുടുംബത്തിന്റെ മൂപ്പൻ; നാട്ടിലെ ആദ്യ തെങ്ങിൻതോപ്പ് നട്ടതിന് അറിയപ്പെട്ടിരുന്നു." });
+
+  P('p2', { nameEn:"Parvathy Amma", nameMl:"പാർവതി അമ്മ", gender:"F", photoUrl:F(58), dob:"1932-05-03", dod:"2009-11-27",
+    birthPlace:"Palakkad, Kerala", occupation:"Homemaker", spouses:["p1"], children:["p4","p5"] });
+
+  P('p3', { nameEn:"Saraswathi Amma", nameMl:"സരസ്വതി അമ്മ", gender:"F", photoUrl:F(61), dob:"1936-09-21", dod:"2012-01-08",
+    birthPlace:"Thrissur, Kerala", occupation:"Weaver", spouses:["p1"], children:["p6"] });
+
+  // ---- Generation 2 ----
+  P('p4', { nameEn:"Raman Nair", nameMl:"രാമൻ നായർ", gender:"M", photoUrl:M(45), dob:"1955-03-10", dod:"2020-06-02",
+    birthPlace:"Palakkad, Kerala", occupation:"Schoolteacher", parents:["p1","p2"], spouses:["p7"], children:["p9","p10"] });
+
+  P('p5', { nameEn:"Vasanthi Nair", nameMl:"വസന്തി നായർ", gender:"F", photoUrl:F(45), dob:"1958-12-01",
+    birthPlace:"Palakkad, Kerala", occupation:"Nurse", parents:["p1","p2"], spouses:["p8"], children:["p11"] });
+
+  P('p6', { nameEn:"Anand Warrier", nameMl:"ആനന്ദ് വാര്യർ", gender:"M", photoUrl:M(50), dob:"1961-08-09",
+    birthPlace:"Thrissur, Kerala", occupation:"Temple musician", parents:["p1","p3"], spouses:["p12"], children:["p13"] });
+
+  // spouses marrying into Gen 2
+  P('p7', { nameEn:"Devi Raman", nameMl:"ദേവി രാമൻ", gender:"F", photoUrl:F(50), dob:"1959-04-18",
+    birthPlace:"Kochi, Kerala", occupation:"Homemaker", spouses:["p4"], children:["p9","p10"] });
+
+  P('p8', { nameEn:"Mohan Das", nameMl:"മോഹൻ ദാസ്", gender:"M", photoUrl:M(63), dob:"1955-01-25",
+    birthPlace:"Kozhikode, Kerala", occupation:"Postmaster", spouses:["p5"], children:["p11"] });
+
+  P('p12', { nameEn:"Radha Anand", nameMl:"രാധ ആനന്ദ്", gender:"F", photoUrl:F(66), dob:"1964-10-30",
+    birthPlace:"Thrissur, Kerala", occupation:"Classical dancer", spouses:["p6"], children:["p13"] });
+
+  // ---- Generation 3 ----
+  P('p9', { nameEn:"Suresh Kumar", nameMl:"സുരേഷ് കുമാർ", gender:"M", photoUrl:M(32), dob:"1980-11-05",
+    birthPlace:"Palakkad, Kerala", occupation:"Bank manager", parents:["p4","p7"], spouses:["p14"], children:["p16","p17"] });
+
+  P('p10', { nameEn:"Latha Menon", nameMl:"ലത മേനോൻ", gender:"F", photoUrl:F(32), dob:"1983-02-18",
+    birthPlace:"Palakkad, Kerala", occupation:"Doctor", parents:["p4","p7"], spouses:["p15"], children:["p18"] });
+
+  P('p11', { nameEn:"Rajesh Das", nameMl:"രാജേഷ് ദാസ്", gender:"M", photoUrl:M(38), dob:"1985-06-14",
+    birthPlace:"Kozhikode, Kerala", occupation:"Civil engineer", parents:["p5","p8"], spouses:[], children:[] });
+
+  P('p13', { nameEn:"Deepa Anand", nameMl:"ദീപ ആനന്ദ്", gender:"F", photoUrl:F(38), dob:"1988-09-27",
+    birthPlace:"Thrissur, Kerala", occupation:"Musician", parents:["p6","p12"], spouses:[], children:[] });
+
+  // spouses marrying into Gen 3
+  P('p14', { nameEn:"Meera Suresh", nameMl:"മീര സുരേഷ്", gender:"F", photoUrl:F(29), dob:"1982-05-22",
+    birthPlace:"Kochi, Kerala", occupation:"School principal", spouses:["p9"], children:["p16","p17"] });
+
+  P('p15', { nameEn:"Vijayan Menon", nameMl:"വിജയൻ മേനോൻ", gender:"M", photoUrl:M(41), dob:"1980-09-14",
+    birthPlace:"Kozhikode, Kerala", occupation:"Advocate", spouses:["p10"], children:["p18"] });
+
+  // ---- Generation 4 ----
+  P('p16', { nameEn:"Arjun Suresh", nameMl:"അർജുൻ സുരേഷ്", gender:"M", photoUrl:M(12), dob:"2008-03-27",
+    birthPlace:"Kochi, Kerala", occupation:"Student", parents:["p9","p14"] });
+
+  P('p17', { nameEn:"Priya Suresh", nameMl:"പ്രിയ സുരേഷ്", gender:"F", photoUrl:F(12), dob:"2011-07-15",
+    birthPlace:"Kochi, Kerala", occupation:"Student", parents:["p9","p14"] });
+
+  P('p18', { nameEn:"Nikhil Vijayan", nameMl:"നിഖിൽ വിജയൻ", gender:"M", photoUrl:M(15), dob:"2012-12-02",
+    birthPlace:"Kozhikode, Kerala", occupation:"Student", parents:["p10","p15"] });
+
+  return d;
+}
+
+/* =========================================================================
+   3. DATABASE — device storage only (window.localStorage), no server
+   ========================================================================= */
+const STORAGE_KEY = 'family_tree_people_v1';
 const DB = {
+  _read(){ const raw = localStorage.getItem(STORAGE_KEY); return raw ? JSON.parse(raw) : null; },
+  _write(data){ localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); },
   async getAll(){
-    const snap = await fsDb.collection('people').get();
-    const data = {};
-    snap.forEach(doc => data[doc.id] = doc.data());
+    let data = this._read();
+    if (!data) { data = seedDummyData(); this._write(data); }
     return data;
   },
-  async setPerson(id, person){ await fsDb.collection('people').doc(id).set(person); },
-  async deletePerson(id){ await fsDb.collection('people').doc(id).delete(); },
+  async setPerson(id, person){ const data = this._read() || {}; data[id] = person; this._write(data); },
+  async deletePerson(id){ const data = this._read() || {}; delete data[id]; this._write(data); },
+  async resetToDummy(){ const data = seedDummyData(); this._write(data); return data; },
   subscribe(cb){
-    return fsDb.collection('people').onSnapshot(snap => {
-      const data = {};
-      snap.forEach(doc => data[doc.id] = doc.data());
-      cb(data);
-    });
+    // keeps multiple tabs on the same device in sync
+    const handler = () => this.getAll().then(cb);
+    window.addEventListener('storage', handler);
+    return () => window.removeEventListener('storage', handler);
   },
-  isAdmin(){ return !!fbAuth.currentUser; },
-  async login(email, password){ await fbAuth.signInWithEmailAndPassword(email, password); },
-  logout(){ fbAuth.signOut(); }
 };
 
 /* =========================================================================
-   5. STATE
+   4. STATE
    ========================================================================= */
-let people = {};       // { id: personObject }
-let rootId = null;      // currently focused node
-let isAdmin = false;
+let people = {};
+let rootId = null;
 
 function genId(){ return 'p_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2,8); }
 
-// Pick a sensible default root: the person in the deepest (youngest / "lowest")
-// generation, so their ancestors are visible above them by default.
+// Pick a sensible default root: the person in the deepest ("lowest") generation,
+// so their ancestors are visible above them by default.
 function pickDefaultRoot(peopleMap){
   const ids = Object.keys(peopleMap);
   if (!ids.length) return null;
   const depth = {};
   function getDepth(id, visiting){
     if (depth[id] !== undefined) return depth[id];
-    if (visiting.has(id)) return 0; // guard against accidental cycles
+    if (visiting.has(id)) return 0;
     visiting.add(id);
     const p = peopleMap[id];
     const parentIds = (p && p.parents) || [];
@@ -247,39 +333,32 @@ function isMlName(p){ return lang === 'ml' && !!p.nameMl; }
 function avatarFor(p){
   if (p.photoUrl) return p.photoUrl;
   const seed = encodeURIComponent(p.nameEn || 'Person');
-  const bg = p.gender === 'F' ? 'C17984' : '5C7D68';
+  const bg = p.gender === 'F' ? 'CD8790' : '6C8F76';
   return `https://ui-avatars.com/api/?name=${seed}&background=${bg}&color=fff&size=128&font-size=0.36`;
 }
 
 /* =========================================================================
-   6. RENDERING
+   5. RENDERING
    ========================================================================= */
-function nodeCard(id, opts={}){
+function nodeCard(id){
   const p = people[id];
   if (!p) return '';
+  const ringColor = p.gender === 'F' ? 'ring-rose/40' : 'ring-leaf/40';
   const borderColor = p.gender === 'F' ? 'border-rose-light' : 'border-leaf-light';
-  const ringColor = p.gender === 'F' ? 'ring-rose/30' : 'ring-leaf/30';
-  const isRoot = id === rootId ? 'ring-2 ring-gold shadow-lg scale-[1.03]' : '';
+  const isRootRing = id === rootId ? 'ring-4 ring-gold shadow-cardHover scale-[1.05]' : 'ring-2 ' + ringColor;
   const birthYear = p.dob ? p.dob.slice(0,4) : '';
   const deathYear = p.dod ? p.dod.slice(0,4) : '';
   const years = birthYear ? (birthYear + (deathYear ? ' \u2013 ' + deathYear : '')) : '';
   return `
-  <div class="node-card group cursor-pointer select-none flex flex-col items-center w-24 sm:w-28 shrink-0 ${isRoot} rounded-2xl transition-transform hover:-translate-y-0.5"
+  <div class="node-card group cursor-pointer select-none flex flex-col items-center w-[5.5rem] sm:w-28 shrink-0 rounded-2xl transition-all duration-200 hover:-translate-y-1"
        data-id="${id}" onclick="onNodeClick('${id}')" ondblclick="onNodeDblClick('${id}')">
     <div class="relative">
-      <img src="${avatarFor(p)}" class="node-photo w-16 h-16 sm:w-20 sm:h-20 rounded-full border-2 ${borderColor} bg-white card-shadow ring-4 ${ringColor}" />
+      <img src="${avatarFor(p)}" class="node-photo w-16 h-16 sm:w-[4.6rem] sm:h-[4.6rem] rounded-full border-2 ${borderColor} bg-white shadow-card ${isRootRing} transition-all duration-200" />
     </div>
-    <div class="mt-1.5 text-center leading-tight">
+    <div class="mt-2 text-center leading-tight">
       <p class="text-xs sm:text-[13px] font-semibold text-ink ${isMlName(p)?'font-ml':''} truncate w-24 sm:w-28" title="${personName(p)}">${personName(p)}</p>
-      ${years ? `<p class="text-[10px] text-teak-light">${years}</p>` : ''}
+      ${years ? `<p class="text-[10px] text-teak-light tracking-wide">${years}</p>` : ''}
     </div>
-  </div>`;
-}
-
-function coupleRow(ids, opts={}){
-  // ids: array of person ids to show side by side connected by a small heart/line
-  return `<div class="flex items-center gap-1.5 sm:gap-2">
-    ${ids.map((id,i) => (i>0 ? `<span class="text-gold-dark text-sm px-0.5">&</span>` : '') + nodeCard(id, opts)).join('')}
   </div>`;
 }
 
@@ -287,30 +366,27 @@ function renderTree(){
   const container = document.getElementById('treeContainer');
   const root = people[rootId];
   if (!root) {
-    document.getElementById('rootLabel').textContent = '—';
+    document.getElementById('rootLabel').textContent = '';
     container.innerHTML = `
-      <div class="text-center py-16">
-        <p class="text-teak font-display text-lg mb-1">${t('emptyTitle')}</p>
-        <p class="text-teak-light text-sm">${t('emptyBody')}</p>
+      <div class="text-center py-20">
+        <p class="text-teak font-display text-xl mb-1.5">${t('emptyTitle')}</p>
+        <p class="text-teak-light text-sm font-serifAccent italic">${t('emptyBody')}</p>
       </div>`;
     return;
   }
 
   document.getElementById('rootLabel').textContent = personName(root);
-  document.getElementById('rootLabel').className = 'font-semibold text-teak ' + (isMlName(root) ? 'font-ml' : '');
+  document.getElementById('rootLabel').className = 'font-semibold text-teak font-display text-base ml-1 ' + (isMlName(root) ? 'font-ml' : '');
 
-  // ---- Ancestors (root's parents, each shown with their spouse(s)) ----
+  // ---- Ancestors ----
   const parentIds = root.parents || [];
   let ancestorsHtml = '';
   if (parentIds.length) {
-    const groups = parentIds.map(pid => {
-      if (!people[pid]) return '';
-      return `<div class="flex flex-col items-center">${nodeCard(pid)}</div>`;
-    }).filter(Boolean);
+    const groups = parentIds.filter(pid => people[pid]).map(pid => `<div class="flex flex-col items-center">${nodeCard(pid)}</div>`);
     ancestorsHtml = `
-    <div class="flex flex-col items-center mb-2">
-      <div class="flex items-start gap-4 sm:gap-8 justify-center flex-wrap">${groups.join('<span class="self-center text-gold-dark text-sm mt-6">&amp;</span>')}</div>
-      <div class="connector-v h-6"></div>
+    <div class="flex flex-col items-center mb-1">
+      <div class="flex items-start gap-5 sm:gap-9 justify-center flex-wrap">${groups.join('<span class="self-center text-gold-dark font-serifAccent text-xl mt-5">&amp;</span>')}</div>
+      <div class="connector-v h-7 rounded-full"></div>
     </div>`;
   }
 
@@ -319,35 +395,34 @@ function renderTree(){
   const coupleIds = [rootId, ...spouseIds];
   const coupleHtml = `
     <div class="flex flex-col items-center">
-      <div class="flex items-center gap-2 sm:gap-3 bg-white/70 border border-gold-light/70 rounded-2xl px-3 sm:px-5 py-3 card-shadow flex-wrap justify-center">
-        ${coupleIds.map((id,i) => (i>0 ? `<span class="text-gold-dark text-lg px-0.5">&#8901;</span>` : '') + nodeCard(id)).join('')}
+      <div class="couple-band flex items-center gap-2.5 sm:gap-4 border border-gold-light/80 rounded-[1.4rem] px-4 sm:px-6 py-3.5 shadow-card flex-wrap justify-center">
+        ${coupleIds.map((id,i) => (i>0 ? `<span class="text-gold-dark font-serifAccent text-xl px-0.5">&#8901;</span>` : '') + nodeCard(id)).join('')}
       </div>
     </div>`;
 
-  // ---- Children ----
+  // ---- Descendants ----
   const childIds = root.children || [];
   let descendantsHtml = '';
   if (childIds.length) {
-    const items = childIds.map(cid => {
+    const items = childIds.filter(cid => people[cid]).map(cid => {
       const child = people[cid];
-      if (!child) return '';
       const childSpouses = (child.spouses || []).filter(sid => people[sid]);
       const group = [cid, ...childSpouses];
       return `<div class="flex flex-col items-center">
-        <div class="connector-v h-6"></div>
-        <div class="flex items-center gap-2 bg-parchment-dark/40 rounded-xl px-2 py-2">
-          ${group.map((id,i)=> (i>0 ? `<span class="text-gold-dark text-sm px-0.5">&#8901;</span>` : '') + nodeCard(id)).join('')}
+        <div class="connector-v h-7 rounded-full"></div>
+        <div class="flex items-center gap-2 bg-gold-soft/40 rounded-2xl px-2.5 py-2.5 border border-gold-light/50">
+          ${group.map((id,i)=> (i>0 ? `<span class="text-gold-dark font-serifAccent text-lg px-0.5">&#8901;</span>` : '') + nodeCard(id)).join('')}
         </div>
       </div>`;
-    }).filter(Boolean);
+    });
     descendantsHtml = `
-    <div class="flex flex-col items-center mt-2">
-      <div class="connector-v h-6"></div>
-      <div class="flex items-start gap-3 sm:gap-6 justify-center flex-wrap max-w-full px-2">${items.join('')}</div>
+    <div class="flex flex-col items-center mt-1">
+      <div class="connector-v h-7 rounded-full"></div>
+      <div class="flex items-start gap-4 sm:gap-7 justify-center flex-wrap max-w-full px-2">${items.join('')}</div>
     </div>`;
   }
 
-  container.innerHTML = `<div class="fade-in flex flex-col items-center py-4 min-w-max mx-auto">
+  container.innerHTML = `<div class="fade-in flex flex-col items-center py-6 min-w-max mx-auto">
       ${ancestorsHtml}
       ${coupleHtml}
       ${descendantsHtml}
@@ -355,11 +430,11 @@ function renderTree(){
 }
 
 /* =========================================================================
-   7. NODE INTERACTIONS  (single click => re-root, double click => details)
+   6. NODE INTERACTIONS (single click => re-root, double click => details)
    ========================================================================= */
 let clickTimer = null;
 function onNodeClick(id){
-  if (clickTimer) { clearTimeout(clickTimer); clickTimer = null; return; } // part of a dblclick, ignore
+  if (clickTimer) { clearTimeout(clickTimer); clickTimer = null; return; }
   clickTimer = setTimeout(() => { rootId = id; renderTree(); clickTimer = null; }, 220);
 }
 function onNodeDblClick(id){
@@ -368,13 +443,13 @@ function onNodeDblClick(id){
 }
 
 /* =========================================================================
-   8. MODALS
+   7. MODALS
    ========================================================================= */
 function modalShell(innerHtml, opts={}){
   const root = document.getElementById('modalRoot');
   root.innerHTML = `
-  <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink/40 backdrop-blur-sm" id="modalBackdrop">
-    <div class="bg-parchment w-full ${opts.wide ? 'max-w-2xl' : 'max-w-md'} max-h-[90vh] overflow-y-auto rounded-2xl card-shadow border border-gold-light/60 fade-in">
+  <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink/45 backdrop-blur-sm fade-in" id="modalBackdrop">
+    <div class="bg-parchment w-full ${opts.wide ? 'max-w-2xl' : 'max-w-md'} max-h-[90vh] overflow-y-auto rounded-3xl shadow-cardHover border border-gold-light/70 pop-in">
       ${innerHtml}
     </div>
   </div>`;
@@ -384,26 +459,26 @@ function modalShell(innerHtml, opts={}){
 }
 function closeModal(){ document.getElementById('modalRoot').innerHTML = ''; }
 
-function relList(ids, opts={}){
-  if (!ids || !ids.length) return `<span class="text-teak-light/70 text-sm">${t('none')}</span>`;
+function relList(ids){
+  if (!ids || !ids.filter(id=>people[id]).length) return `<span class="text-teak-light/70 text-sm">${t('none')}</span>`;
   return ids.filter(id=>people[id]).map(id => `<button onclick="closeModal(); rootId='${id}'; renderTree();" class="text-sm underline decoration-gold-dark decoration-1 underline-offset-2 text-teak hover:text-gold-dark ${isMlName(people[id])?'font-ml':''}">${personName(people[id])}</button>`).join(', ');
 }
 
 function openDetailModal(id){
   const p = people[id];
   if (!p) return;
-  const field = (label, val) => val ? `<div class="mb-2.5"><p class="text-[11px] uppercase tracking-wide text-teak-light/70">${label}</p><p class="text-sm text-ink ${''}">${val}</p></div>` : '';
+  const field = (label, val) => val ? `<div class="mb-2.5"><p class="text-[11px] uppercase tracking-wide text-teak-light/70">${label}</p><p class="text-sm text-ink">${val}</p></div>` : '';
   modalShell(`
     <div class="p-6 sm:p-7">
       <div class="flex items-start justify-between gap-3 mb-4">
         <div class="flex items-center gap-4">
-          <img src="${avatarFor(p)}" class="w-20 h-20 rounded-full border-2 ${p.gender==='F'?'border-rose-light':'border-leaf-light'} card-shadow" />
+          <img src="${avatarFor(p)}" class="w-20 h-20 rounded-full border-2 ${p.gender==='F'?'border-rose-light':'border-leaf-light'} shadow-card" />
           <div>
             <h2 class="font-display text-xl text-teak font-semibold">${p.nameEn || '—'}</h2>
             ${p.nameMl ? `<p class="font-ml text-teak-light text-base">${p.nameMl}</p>` : ''}
           </div>
         </div>
-        <button onclick="closeModal()" class="text-teak-light hover:text-ink text-xl leading-none px-1">&times;</button>
+        <button onclick="closeModal()" class="text-teak-light hover:text-ink text-2xl leading-none px-1">&times;</button>
       </div>
 
       <div class="grid grid-cols-2 gap-x-4">
@@ -416,7 +491,7 @@ function openDetailModal(id){
       ${p.notesEn ? `<div class="mb-2.5"><p class="text-[11px] uppercase tracking-wide text-teak-light/70">${t('notes')}</p><p class="text-sm text-ink">${p.notesEn}</p></div>` : ''}
       ${p.notesMl ? `<div class="mb-2.5"><p class="text-[11px] uppercase tracking-wide text-teak-light/70">${t('notesMl')}</p><p class="text-sm text-ink font-ml">${p.notesMl}</p></div>` : ''}
 
-      <hr class="border-gold-light/50 my-4">
+      <div class="ornament-divider my-4"></div>
 
       <div class="space-y-2.5">
         <div><span class="text-[11px] uppercase tracking-wide text-teak-light/70 mr-2">${t('parents')}</span>${relList(p.parents)}</div>
@@ -424,14 +499,13 @@ function openDetailModal(id){
         <div><span class="text-[11px] uppercase tracking-wide text-teak-light/70 mr-2">${t('children')}</span>${relList(p.children)}</div>
       </div>
 
-      ${isAdmin ? `
       <div class="mt-6 pt-4 border-t border-gold-light/50 flex flex-wrap gap-2">
-        <button onclick="openEditForm('${id}')" class="px-3 py-1.5 text-sm rounded-full border border-teak text-teak hover:bg-teak hover:text-parchment transition">${t('edit')}</button>
-        <button onclick="openAddRelativeForm('${id}','spouse')" class="px-3 py-1.5 text-sm rounded-full border border-leaf text-leaf hover:bg-leaf hover:text-parchment transition">${t('addSpouse')}</button>
-        <button onclick="openAddRelativeForm('${id}','child')" class="px-3 py-1.5 text-sm rounded-full border border-leaf text-leaf hover:bg-leaf hover:text-parchment transition">${t('addChild')}</button>
-        <button onclick="openAddRelativeForm('${id}','parent')" class="px-3 py-1.5 text-sm rounded-full border border-leaf text-leaf hover:bg-leaf hover:text-parchment transition">${t('addParent')}</button>
-        <button onclick="confirmDelete('${id}')" class="px-3 py-1.5 text-sm rounded-full border border-rose text-rose hover:bg-rose hover:text-parchment transition ml-auto">${t('delete')}</button>
-      </div>` : ''}
+        <button onclick="openEditForm('${id}')" class="px-3 py-1.5 text-sm rounded-full border border-teak text-teak hover:bg-teak hover:text-parchment transition-colors">${t('edit')}</button>
+        <button onclick="openAddRelativeForm('${id}','spouse')" class="px-3 py-1.5 text-sm rounded-full border border-leaf text-leaf hover:bg-leaf hover:text-parchment transition-colors">${t('addSpouse')}</button>
+        <button onclick="openAddRelativeForm('${id}','child')" class="px-3 py-1.5 text-sm rounded-full border border-leaf text-leaf hover:bg-leaf hover:text-parchment transition-colors">${t('addChild')}</button>
+        <button onclick="openAddRelativeForm('${id}','parent')" class="px-3 py-1.5 text-sm rounded-full border border-leaf text-leaf hover:bg-leaf hover:text-parchment transition-colors">${t('addParent')}</button>
+        <button onclick="confirmDelete('${id}')" class="px-3 py-1.5 text-sm rounded-full border border-rose text-rose hover:bg-rose hover:text-parchment transition-colors ml-auto">${t('delete')}</button>
+      </div>
     </div>
   `);
 }
@@ -445,10 +519,11 @@ function formField(labelKey, inputHtml){
 const inputCls = "w-full text-sm rounded-lg border border-gold-light bg-white px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gold/40";
 
 function openEditForm(id){
-  const p = people[id] || { nameEn:"", nameMl:"", gender:"M", photoUrl:"", dob:"", dod:"", birthPlace:"", occupation:"", notesEn:"", notesMl:"" };
+  const existing = people[id];
+  const p = existing || { nameEn:"", nameMl:"", gender:"M", photoUrl:"", dob:"", dod:"", birthPlace:"", occupation:"", notesEn:"", notesMl:"" };
   modalShell(`
     <form id="editForm" class="p-6 sm:p-7">
-      <h2 class="font-display text-lg text-teak font-semibold mb-4">${id ? t('edit') : t('newPerson')}</h2>
+      <h2 class="font-display text-lg text-teak font-semibold mb-4">${existing ? t('edit') : t('newPerson')}</h2>
       ${formField('fullName', `<input required name="nameEn" value="${p.nameEn||''}" class="${inputCls}">`)}
       ${formField('fullNameMl', `<input name="nameMl" value="${p.nameMl||''}" class="${inputCls} font-ml">`)}
       <label class="block mb-3">
@@ -466,7 +541,7 @@ function openEditForm(id){
       ${formField('notes', `<textarea name="notesEn" rows="2" class="${inputCls}">${p.notesEn||''}</textarea>`)}
       ${formField('notesMl', `<textarea name="notesMl" rows="2" class="${inputCls} font-ml">${p.notesMl||''}</textarea>`)}
       <div class="flex justify-end gap-2 mt-5">
-        <button type="button" onclick="openDetailModal('${id}')" class="px-4 py-1.5 text-sm rounded-full border border-teak-light text-teak-light hover:bg-gold-light/20">${t('cancel')}</button>
+        <button type="button" onclick="${existing ? `openDetailModal('${id}')` : 'closeModal()'}" class="px-4 py-1.5 text-sm rounded-full border border-teak-light text-teak-light hover:bg-gold-soft">${t('cancel')}</button>
         <button type="submit" class="px-4 py-1.5 text-sm rounded-full bg-teak text-parchment hover:bg-ink">${t('save')}</button>
       </div>
     </form>
@@ -485,13 +560,13 @@ function openEditForm(id){
     });
     await DB.setPerson(id, updated);
     people[id] = updated;
+    if (!rootId) rootId = id;
     renderTree();
     openDetailModal(id);
   });
 }
 
 function openAddRelativeForm(anchorId, relation){
-  // relation: 'spouse' | 'child' | 'parent'
   const anchor = people[anchorId];
   const candidates = Object.keys(people).filter(pid => pid !== anchorId);
   const relLabel = relation === 'spouse' ? t('addSpouse') : relation === 'child' ? t('addChild') : t('addParent');
@@ -520,7 +595,7 @@ function openAddRelativeForm(anchorId, relation){
           ${formField('dob', `<input type="date" name="dob" class="${inputCls}">`)}
           ${formField('photoUrl', `<input name="photoUrl" placeholder="https://…" class="${inputCls}">`)}
           <div class="flex justify-end gap-2 mt-5">
-            <button type="button" onclick="openDetailModal('${anchorId}')" class="px-4 py-1.5 text-sm rounded-full border border-teak-light text-teak-light hover:bg-gold-light/20">${t('cancel')}</button>
+            <button type="button" onclick="openDetailModal('${anchorId}')" class="px-4 py-1.5 text-sm rounded-full border border-teak-light text-teak-light hover:bg-gold-soft">${t('cancel')}</button>
             <button type="submit" class="px-4 py-1.5 text-sm rounded-full bg-teak text-parchment hover:bg-ink">${t('save')}</button>
           </div>
         </form>
@@ -535,7 +610,7 @@ function openAddRelativeForm(anchorId, relation){
           </select>
         </label>
         <div class="flex justify-end gap-2">
-          <button type="button" onclick="openDetailModal('${anchorId}')" class="px-4 py-1.5 text-sm rounded-full border border-teak-light text-teak-light hover:bg-gold-light/20">${t('cancel')}</button>
+          <button type="button" onclick="openDetailModal('${anchorId}')" class="px-4 py-1.5 text-sm rounded-full border border-teak-light text-teak-light hover:bg-gold-soft">${t('cancel')}</button>
           <button id="linkExistingBtn" class="px-4 py-1.5 text-sm rounded-full bg-teak text-parchment hover:bg-ink">${t('save')}</button>
         </div>
       </div>
@@ -602,14 +677,13 @@ function confirmDelete(id){
     <div class="p-6 sm:p-7 text-center">
       <p class="text-sm text-ink mb-5">${t('confirmDelete')}</p>
       <div class="flex justify-center gap-2">
-        <button onclick="openDetailModal('${id}')" class="px-4 py-1.5 text-sm rounded-full border border-teak-light text-teak-light hover:bg-gold-light/20">${t('cancel')}</button>
+        <button onclick="openDetailModal('${id}')" class="px-4 py-1.5 text-sm rounded-full border border-teak-light text-teak-light hover:bg-gold-soft">${t('cancel')}</button>
         <button onclick="doDelete('${id}')" class="px-4 py-1.5 text-sm rounded-full bg-rose text-parchment hover:bg-rose-light">${t('yes')}</button>
       </div>
     </div>
   `);
 }
 async function doDelete(id){
-  // remove references from every other person
   for (const pid of Object.keys(people)) {
     if (pid === id) continue;
     const p = people[pid];
@@ -626,41 +700,15 @@ async function doDelete(id){
   renderTree();
 }
 
-/* =========================================================================
-   9. LOGIN MODAL
-   ========================================================================= */
-function openLoginModal(){
-  modalShell(`
-    <form id="loginForm" class="p-6 sm:p-7">
-      <h2 class="font-display text-lg text-teak font-semibold mb-4">${t('loginTitle')}</h2>
-      ${formField('email', `<input required type="email" name="email" class="${inputCls}">`)}
-      ${formField('password', `<input required type="password" name="password" class="${inputCls}">`)}
-      <p id="loginError" class="text-rose text-xs mb-2 hidden"></p>
-      <div class="flex justify-end gap-2 mt-3">
-        <button type="button" onclick="closeModal()" class="px-4 py-1.5 text-sm rounded-full border border-teak-light text-teak-light hover:bg-gold-light/20">${t('cancel')}</button>
-        <button type="submit" class="px-4 py-1.5 text-sm rounded-full bg-teak text-parchment hover:bg-ink">${t('signIn')}</button>
-      </div>
-    </form>
-  `);
-  document.getElementById('loginForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const fd = new FormData(e.target);
-    try {
-      await DB.login(fd.get('email'), fd.get('password'));
-      isAdmin = DB.isAdmin();
-      closeModal();
-      renderChrome();
-      renderTree();
-    } catch (err) {
-      const el = document.getElementById('loginError');
-      el.textContent = err.message || 'Login failed';
-      el.classList.remove('hidden');
-    }
-  });
+async function resetDemoData(){
+  if (!confirm('Reset all data back to the starting demo family? This removes any edits.')) return;
+  people = await DB.resetToDummy();
+  rootId = pickDefaultRoot(people);
+  renderTree();
 }
 
 /* =========================================================================
-   10. CHROME (top bar admin state, admin toolbar, language)
+   8. CHROME (language toggle, static text)
    ========================================================================= */
 function applyI18nStatic(){
   document.querySelectorAll('[data-i18n]').forEach(el => el.textContent = t(el.getAttribute('data-i18n')));
@@ -670,28 +718,8 @@ function applyI18nStatic(){
   document.getElementById('langToggle').textContent = lang === 'en' ? 'EN / മല' : 'മല / EN';
 }
 
-function renderChrome(){
-  applyI18nStatic();
-  const authBtn = document.getElementById('authBtn');
-  const toolbar = document.getElementById('adminToolbar');
-  if (isAdmin) {
-    authBtn.textContent = t('logout');
-    authBtn.onclick = () => { DB.logout(); isAdmin = false; renderChrome(); renderTree(); };
-    toolbar.classList.remove('hidden');
-    toolbar.innerHTML = `
-      <span class="text-xs text-leaf font-medium px-2 py-1 bg-leaf/10 rounded-full">${t('loggedInAs')}</span>
-      <button onclick="openEditForm(genId())" class="text-xs px-3 py-1.5 rounded-full border border-teak text-teak hover:bg-teak hover:text-parchment" id="addPersonBtn">${t('addPerson')}</button>
-    `;
-  } else {
-    authBtn.textContent = t('login');
-    authBtn.onclick = openLoginModal;
-    toolbar.classList.add('hidden');
-    toolbar.innerHTML = '';
-  }
-}
-
 /* =========================================================================
-   11. SEARCH
+   9. SEARCH
    ========================================================================= */
 function wireSearch(inputId, resultsId){
   const input = document.getElementById(inputId);
@@ -703,8 +731,8 @@ function wireSearch(inputId, resultsId){
       (p.nameEn||'').toLowerCase().includes(q) || (p.nameMl||'').includes(q)
     ).slice(0, 8);
     results.innerHTML = matches.length
-      ? matches.map(([id,p]) => `<button class="w-full text-left px-3 py-2 text-sm hover:bg-gold-light/20 flex items-center gap-2" onclick="selectSearchResult('${id}','${inputId}','${resultsId}')">
-          <img src="${avatarFor(p)}" class="w-6 h-6 rounded-full">
+      ? matches.map(([id,p]) => `<button class="w-full text-left px-3 py-2 text-sm hover:bg-gold-soft/60 flex items-center gap-2" onclick="selectSearchResult('${id}','${inputId}','${resultsId}')">
+          <img src="${avatarFor(p)}" class="w-6 h-6 rounded-full object-cover">
           <span>${p.nameEn}${p.nameMl ? ' · <span class=\"font-ml\">'+p.nameMl+'</span>' : ''}</span>
         </button>`).join('')
       : `<p class="px-3 py-2 text-sm text-teak-light">${t('noResults')}</p>`;
@@ -722,12 +750,12 @@ function selectSearchResult(id, inputId, resultsId){
 }
 
 /* =========================================================================
-   12. INIT
+   10. INIT
    ========================================================================= */
 document.getElementById('langToggle').addEventListener('click', () => {
   lang = lang === 'en' ? 'ml' : 'en';
   localStorage.setItem('ft_lang', lang);
-  renderChrome();
+  applyI18nStatic();
   renderTree();
 });
 document.getElementById('homeBtn').addEventListener('click', () => {
@@ -738,22 +766,20 @@ wireSearch('searchInput', 'searchResults');
 wireSearch('searchInputMobile', 'searchResultsMobile');
 
 async function init(){
-  renderChrome();
+  applyI18nStatic();
   people = await DB.getAll();
   rootId = pickDefaultRoot(people);
   renderTree();
-
   DB.subscribe(data => {
     people = data;
     if (!people[rootId]) rootId = pickDefaultRoot(people);
     renderTree();
   });
-
-  fbAuth.onAuthStateChanged(user => { isAdmin = !!user; renderChrome(); renderTree(); });
 }
 init();
 
- const hear = document.getElementById("hear");
+
+const hear = document.getElementById("hear");
 const audio = document.getElementById("audio");
 
 let isEnglish = true;
@@ -762,12 +788,15 @@ hear.addEventListener("click", function () {
 
     if (audio.paused) {
 
-        // Select the audio file
+        // Select language audio
         audio.src = isEnglish ? "eng.mp3" : "mal.mp3";
 
-        audio.play();
+        // Play audio
+        audio.play().catch(error => {
+            console.log("Audio playback failed:", error);
+        });
 
-        // Change for next click
+        // Change language for next click
         isEnglish = !isEnglish;
 
     } else {
@@ -776,18 +805,22 @@ hear.addEventListener("click", function () {
 });
 
 audio.addEventListener("play", function () {
-    hear.textContent = "🔉";
+    hear.classList.add("opacity-50");
+    hear.classList.remove("opacity-100");
 });
 
 audio.addEventListener("pause", function () {
-    hear.textContent = "🔊";
+    hear.classList.remove("opacity-50");
+    hear.classList.add("opacity-100");
 });
 
 audio.addEventListener("ended", function () {
-    hear.textContent = "🔊";
+    hear.classList.remove("opacity-50");
+    hear.classList.add("opacity-100");
 });
 
- 
+
+
 </script>
 </body>
 </html>
