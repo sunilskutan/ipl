@@ -219,6 +219,8 @@ function genId(){ return 'p_' + Date.now().toString(36) + '_' + Math.random().to
 
 // Pick a sensible default root: the person in the deepest (youngest / "lowest")
 // generation, so their ancestors are visible above them by default.
+ // disabled this fn to appear nothing at start
+ /*
 function pickDefaultRoot(peopleMap){
   const ids = Object.keys(peopleMap);
   if (!ids.length) return null;
@@ -241,7 +243,7 @@ function pickDefaultRoot(peopleMap){
   ids.forEach(id => { if (depth[id] > bestDepth) { bestDepth = depth[id]; best = id; } });
   return best;
 }
-
+*/
 function personName(p){ return lang === 'ml' && p.nameMl ? p.nameMl : (p.nameEn || '(unnamed)'); }
 function isMlName(p){ return lang === 'ml' && !!p.nameMl; }
 function avatarFor(p){
