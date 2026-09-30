@@ -157,7 +157,7 @@ const I18N = {
     selectPerson: "Select person…", relationTo: "in relation to",
     loggedInAs: "Signed in as admin", errorRequired: "Name (English) is required.",
     addPerson: "Add family member", noResults: "No matches found",
-    emptyTitle: "No one has been added yet", emptyBody: "Sign in as admin to add the first family member.",
+    emptyTitle: "Nothing has been searched yet", emptyBody: "Enter the name in the search box and select .",
   },
   ml: {
     appTitle: "കുടുംബം", search: "പേര് തിരയുക…", login: "അഡ്മിൻ ലോഗിൻ", logout: "ലോഗ് ഔട്ട്",
@@ -174,7 +174,7 @@ const I18N = {
     selectPerson: "വ്യക്തിയെ തിരഞ്ഞെടുക്കുക…", relationTo: "എന്നതുമായി ബന്ധപ്പെട്ട്",
     loggedInAs: "അഡ്മിനായി സൈൻ ഇൻ ചെയ്തു", errorRequired: "പേര് (ഇംഗ്ലീഷ്) നിർബന്ധമാണ്.",
     addPerson: "കുടുംബാംഗത്തെ ചേർക്കുക", noResults: "ഫലങ്ങളൊന്നും ഇല്ല",
-    emptyTitle: "ഇതുവരെ ആരെയും ചേർത്തിട്ടില്ല", emptyBody: "ആദ്യ അംഗത്തെ ചേർക്കാൻ അഡ്മിനായി സൈൻ ഇൻ ചെയ്യുക.",
+    emptyTitle: "ഇതുവരെ ആരെയും തിരഞ്ഞില്ല", emptyBody: "സേര്‍ച്ച്‌ ബോക്സിൽ പേര് നൽകി തിരഞ്ഞെടുക്കുക.",
   }
 };
 let lang = localStorage.getItem('ft_lang') || 'en';
@@ -220,8 +220,46 @@ function genId(){ return 'p_' + Date.now().toString(36) + '_' + Math.random().to
 // Pick a sensible default root: the person in the deepest (youngest / "lowest")
 // generation, so their ancestors are visible above them by default.
  // disabled this fn to appear nothing at start
- /*
+ 
 function pickDefaultRoot(peopleMap){
+
+function showWelcome() {
+    // Prevent duplicate marquee
+    if (document.getElementById("welcomeMarquee")) return;
+
+    document.body.insertAdjacentHTML("beforeend", `
+        <marquee id="welcomeMarquee"
+                 class="bg-teal-100 text-teal-800 text-lg font-semibold py-2 rounded-lg"
+                 behavior="scroll"
+                 direction="left"
+                 scrollamount="5">
+            ✨ Enter a Name in the Search box ✨
+        </marquee>
+    `);
+
+    // Function to remove the marquee and clean up listeners
+    const removeMarquee = () => {
+        const marquee = document.getElementById("welcomeMarquee");
+        if (marquee) {
+            marquee.remove();
+            
+            // Remove the event listeners once interaction occurs
+            window.removeEventListener("pointerdown", removeMarquee);
+            window.removeEventListener("keydown", removeMarquee);
+            window.removeEventListener("scroll", removeMarquee);
+            window.removeEventListener("touchstart", removeMarquee);
+        }
+    };
+
+    // Listen for the first user interaction event
+    window.addEventListener("pointerdown", removeMarquee, { once: true });
+    window.addEventListener("keydown", removeMarquee, { once: true });
+    window.addEventListener("scroll", removeMarquee, { once: true });
+    window.addEventListener("touchstart", removeMarquee, { once: true });
+}
+
+showWelcome();
+/*
   const ids = Object.keys(peopleMap);
   if (!ids.length) return null;
   const depth = {};
@@ -242,8 +280,9 @@ function pickDefaultRoot(peopleMap){
   let best = ids[0], bestDepth = -1;
   ids.forEach(id => { if (depth[id] > bestDepth) { bestDepth = depth[id]; best = id; } });
   return best;
+ */ 
 }
-*/
+
 function personName(p){ return lang === 'ml' && p.nameMl ? p.nameMl : (p.nameEn || '(unnamed)'); }
 function isMlName(p){ return lang === 'ml' && !!p.nameMl; }
 function avatarFor(p){
